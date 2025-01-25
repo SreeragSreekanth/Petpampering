@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Service Details</h2>
+    
+    <!-- Center the card and content -->
+    <div class="d-flex justify-content-center">
+        <div class="card shadow-lg border-0 rounded-4" style="max-width: 600px;">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">{{ service.name }}</h5>
+            </div>
+            <div class="card-body">
+                <!-- Display the name of the one who posted the service -->
+                <p><strong>Offered by:</strong> {{ service.groomer.username }}</p>
+
+                <!-- Display the service image or placeholder -->
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="img-fluid rounded mb-3" alt="{{ service.name }}">
+                {% else %}
+                    <img src="#" class="img-fluid rounded mb-3" alt="placeholder">
+                {% endif %}
+                
+                <!-- Display the service description, price, and availability -->
+                <p><strong>Description:</strong> {{ service.description }}</p>
+                <p><strong>Price:</strong> ${{ service.price }}</p>
+                <p><strong>Availability:</strong>
+                    {% if service.availability %}
+                        <span class="badge bg-success">Available</span>
+                    {% else %}
+                        <span class="badge bg-danger">Unavailable</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        {% if user.role == 'admin' %}
+            <a href="{% url 'all_services' %}" class="btn btn-secondary">Back to Services</a>
+        {% elif user.role == 'groomer' %}
+            <a href="{% url 'manage_services' %}" class="btn btn-secondary">Back to Services</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

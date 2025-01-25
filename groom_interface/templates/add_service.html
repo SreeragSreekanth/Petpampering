@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pet Grooming{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4" style="background: #f8f9fa;">
+                <div class="card-header text-center py-3" style="background: linear-gradient(135deg, #6a11cb, #2575fc); border-radius: 10px 10px 0 0;">
+                    <h4 class="text-white fw-bold">✨ Add a New Service</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">  <!-- Added enctype for file upload -->
+                        {% csrf_token %}
+                        {{ form|crispy }}
+
+                        <div class="d-grid gap-3 mt-4">
+                            <button type="submit" class="btn text-white fw-bold" style="background: #28a745; border-radius: 8px;">
+                                <i class="bi bi-plus-circle"></i> Add Service
+                            </button>
+                            <a href="{% url 'groomer_dashboard' %}" class="btn btn-light border fw-bold" style="border-radius: 8px;">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

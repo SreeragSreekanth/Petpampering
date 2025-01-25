@@ -1,0 +1,66 @@
+/* Instagram-Style Profile */
+.profile-img-wrapper {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #ddd;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Make the entire card a flexible container */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Card body should allow for flexible content without overlap */
+.card-body {
+    flex-grow: 1; /* Allow the body to expand and fill space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Space between the items */
+    padding: 15px;
+    overflow: hidden;
+}
+
+/* Limit image size but maintain aspect ratio */
+.card-body img {
+    max-height: 200px; /* Set a max height for images */
+    width: 100%; /* Ensure image is responsive */
+    object-fit: cover; /* Avoid stretching of the image */
+    margin-bottom: 15px;
+}
+
+/* Ensure description text is truncated */
+.card-body p.description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;  /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Availability section styled separately to prevent overlap */
+.card-body p.availability {
+    margin-top: auto; /* Push it to the bottom of the card */
+}
+
+/* Card footer (buttons) should stay at the bottom */
+.card-footer {
+    margin-top: auto; /* Ensure footer sticks at the bottom */
+    padding: 10px;
+}
+
+/* Ensure no text is overflowing outside */
+.card-body p {
+    word-wrap: break-word;
+    word-break: break-word;
+}

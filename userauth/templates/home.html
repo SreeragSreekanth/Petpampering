@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to PawPerfect{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero bg-primary text-white text-center py-5">
+    <div class="container">
+        <h1 class="display-3">Welcome to PawPerfect</h1>
+        <p class="lead">Your one-stop solution for all your pet grooming needs</p>
+        <a href="{% url 'signup' %}" class="btn btn-light btn-lg mt-3">Get Started</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Why Choose PawPerfect?</h2>
+        <div class="row">
+            <!-- Feature 1 -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-house-door-fill fs-3 mb-3"></i>
+                        <h5 class="card-title">Convenient</h5>
+                        <p>Schedule appointments at your convenience, from the comfort of your home.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-lock-fill fs-3 mb-3"></i>
+                        <h5 class="card-title">Secure</h5>
+                        <p>Trust us with your pet’s well-being. We provide secure and hygienic services.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-card-checklist fs-3 mb-3"></i>
+                        <h5 class="card-title">Reliable</h5>
+                        <p>Our team is dedicated to providing the best grooming experience for your pet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta bg-light py-5 text-center">
+    <div class="container">
+        <h2>Ready to make your pet look fabulous?</h2>
+        <p class="lead">Sign up today and book your first grooming appointment!</p>
+        <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Join Now</a>
+    </div>
+</section>
+
+
+
+{% endblock %}

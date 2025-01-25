@@ -1,0 +1,25 @@
+# Ignore SQLite database files
+*.sqlite3
+*.db
+
+# Ignore Django/Flask migrations
+migrations/
+*/migrations/
+migrations/**
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment
+venv/
+.env/
+*.env
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo

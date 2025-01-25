@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Pet Grooming{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">🐶 Groomer Dashboard</h2>
+
+    <!-- First Layer: Profile Card (Full Width) -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm border-0 rounded-4 p-4">
+                <div class="row align-items-center">
+                    <!-- Profile Picture on Left -->
+                    <div class="col-md-4 text-center">
+                        <div class="profile-img-wrapper">
+                            {% if user.groomer_profile.profile_picture %}
+                                <img src="{{ user.groomer_profile.profile_picture.url }}" class="profile-img img-fluid shadow-sm" alt="Profile Picture">
+                            {% else %}
+                                <img src="https://via.placeholder.com/150" class="profile-img img-fluid shadow-sm" alt="Profile Picture">
+                            {% endif %}
+                        </div>
+                    </div>
+    
+                    <!-- Groomer Details on Right -->
+                    <div class="col-md-8">
+                        <h3 class="fw-bold">{{ user.username }}</h3>
+                        <p class="text-muted">@{{ user.username|lower }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Location:</strong> {{ user.groomer_profile.location|default:"Not Provided" }}</p>
+                        <p><strong>Experience:</strong> {{ user.groomer_profile.experience_years }} years</p>
+                        <p><strong>Bio:</strong> {{ user.groomer_profile.bio|default:"No bio available" }}</p>
+                        
+                        <!-- Edit Profile Button -->
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm mt-2">Edit Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Second Layer: Manage Services & Appointments -->
+    <div class="row justify-content-center">
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 h-100 d-flex flex-column">
+                <div class="card-header bg-secondary text-white text-center">
+                    <h5>🛠 Manage Services</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p>View, edit, or add new services.</p>
+                    <a href="{% url 'manage_services' %}" class="btn btn-secondary btn-sm mt-auto">Manage Services</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 h-100 d-flex flex-column">
+                <div class="card-header bg-info text-white text-center">
+                    <h5>📅 Appointments</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p>Check upcoming appointments & accept/reject requests.</p>
+                    <a href="{% url 'manage_appointments' %}" class="btn btn-info btn-sm mt-auto">Manage Appointments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Layer: Feedback & Messages -->
+    <div class="row justify-content-center">
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 h-100 d-flex flex-column">
+                <div class="card-header bg-warning text-white text-center">
+                    <h5>⭐ Feedback & Ratings</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p>View customer feedback and ratings.</p>
+                    <a href="#" class="btn btn-warning btn-sm mt-auto">View Feedback</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 h-100 d-flex flex-column">
+                <div class="card-header bg-success text-white text-center">
+                    <h5>💬 Messages</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p>Communicate with pet owners.</p>
+                    <a href="#" class="btn btn-success btn-sm mt-auto">Open Messages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
