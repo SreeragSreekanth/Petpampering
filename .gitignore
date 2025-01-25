@@ -13,11 +13,12 @@ __pycache__/
 *.pyo
 *.pyd
 
+
 # Ignore virtual environment
 venv/
 .env/
 *.env
-
+env/
 # Ignore logs and temporary files
 *.log
 *.tmp
