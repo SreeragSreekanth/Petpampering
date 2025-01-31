@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary fw-bold">Welcome to Your Dashboard, {{ profile.user.username }}!</h2>
+
+    <!-- Profile Section -->
+    <div class="card shadow-lg mb-4 border-0 rounded-4">
+        <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+            <h5 class="mb-0">Your Profile</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <!-- Profile Picture -->
+                <div class="col-md-3 text-center">
+                    <div class="profile-picture-container rounded-circle border border-4 border-light shadow-sm" style="width: 120px; height: 120px; overflow: hidden;">
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="w-100 h-100" style="object-fit: cover;">
+                        {% else %}
+                            <img src="https://via.placeholder.com/120" alt="Profile Picture" class="w-100 h-100" style="object-fit: cover;">
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Profile Details -->
+                <div class="col-md-9">
+                    <h4 class="fw-bold mb-3">{{ profile.user.first_name }} {{ profile.user.last_name }}</h4>
+                    <p class="mb-2"><strong>Email:</strong> {{ profile.user.email }}</p>
+                    <p class="mb-2"><strong>Phone:</strong> {{ profile.phone_number|default:"Not provided" }}</p>
+                    <p class="mb-2"><strong>Address:</strong> {{ profile.address|default:"Not provided" }}</p>
+                    <a href="{% url 'profile_management' %}" class="btn btn-primary btn-sm mt-2">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pets Summary -->
+    <div class="card shadow-lg mb-4 border-0 rounded-4">
+        <div class="card-header bg-success text-white text-center py-3 rounded-top-4">
+            <h5 class="mb-0">Your Pets</h5>
+        </div>
+        <div class="card-body p-4">
+            {% if pets %}
+                <div class="row">
+                    {% for pet in pets %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100 border-0 rounded-4">
+                            <!-- Pet Picture -->
+                            <div class="pet-picture-container" style="height: 200px; overflow: hidden;">
+                                {% if pet.pet_picture %}
+                                    <img src="{{ pet.pet_picture.url }}" alt="{{ pet.name }}" class="w-100 h-100" style="object-fit: cover;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/150" alt="Pet Image" class="w-100 h-100" style="object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            <!-- Pet Details -->
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">{{ pet.name }}</h5>
+                                <p class="card-text">
+                                    <strong>Breed:</strong> {{ pet.breed }}<br>
+                                    <strong>Age:</strong> {{ pet.age }} years<br>
+                                    <strong>Weight:</strong> {{ pet.weight }} kg<br>
+                                    <strong>Gender:</strong> {{ pet.gender }}
+                                </p>
+                                <!-- Edit and Delete Buttons -->
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'edit_pet' pet.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="{% url 'delete_pet' pet.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-muted">You haven't added any pets yet.</p>
+            {% endif %}
+            <!-- Add New Pet Button -->
+            <div class="text-center mt-4">
+                <a href="{% url 'add_pet' %}" class="btn btn-success btn-sm">Add New Pet</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card shadow-lg mb-4 border-0 rounded-4">
+        <div class="card-header bg-info text-white text-center py-3 rounded-top-4">
+            <h5 class="mb-0">Quick Links</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'profile_management' %}" class="btn btn-outline-primary w-100">Edit Profile</a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="{% url 'add_pet' %}" class="btn btn-outline-success w-100">Add Pet</a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="#" class="btn btn-outline-warning w-100">View Appointments</a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="#" class="btn btn-outline-info w-100">Explore Services</a>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <a href="#" class="btn btn-outline-secondary w-100">Join Community</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

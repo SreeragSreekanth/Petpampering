@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Add a New Pet</h2>
+    <div class="card shadow-lg p-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}  <!-- Using Crispy Forms -->
+            <button type="submit" class="btn btn-primary w-100">Add Pet</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

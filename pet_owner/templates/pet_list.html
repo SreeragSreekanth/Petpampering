@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Your Pets</h2>
+    <a href="{% url 'add_pet' %}" class="btn btn-success mb-3">Add New Pet</a>
+    <div class="row">
+        {% for pet in pets %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                {% if pet.pet_picture %}
+                <img src="{{ pet.pet_picture.url }}" class="card-img-top" alt="{{ pet.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ pet.name }}</h5>
+                    <p class="card-text">
+                        <strong>Breed:</strong> {{ pet.breed }}<br>
+                        <strong>Age:</strong> {{ pet.age }} years<br>
+                        <strong>Weight:</strong> {{ pet.weight }} kg<br>
+                        <strong>Gender:</strong> {{ pet.gender }}
+                    </p>
+                    <a href="{% url 'edit_pet' pet.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'delete_pet' pet.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

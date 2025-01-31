@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'admin_panel',
     'userauth',
     'groom_interface',
+    'pet_owner',
 ]
 
 MIDDLEWARE = [
