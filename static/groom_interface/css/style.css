@@ -64,3 +64,18 @@
     word-wrap: break-word;
     word-break: break-word;
 }
+
+
+/* Profile Picture Styling */
+.profile-picture-container {
+    width: 120px;  /* Smaller size */
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;  /* Ensures the image stays inside the circle */
+    border: 2px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;  
+    /* Centers the profile picture */
+}

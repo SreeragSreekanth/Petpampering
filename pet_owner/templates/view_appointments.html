@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Your Appointments</h2>
+
+    <div class="row">
+        {% for appointment in appointments %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ appointment.service.name }}</h5>
+                    <p class="card-text"><strong>Groomer:</strong> {{ appointment.groomer.username }}</p>
+                    <p class="card-text"><strong>Date & Time:</strong> {{ appointment.date_time }}</p>
+                    <p class="card-text"><strong>Status:</strong> {{ appointment.status }}</p>
+                    
+                    <!-- Button group with flex to align buttons -->
+                    <div class="d-flex justify-content-between">
+                        <!-- Reschedule button -->
+                        <a href="{% url 'reschedule_appointment' appointment.id %}" class="btn btn-warning btn-sm">Reschedule</a>
+
+                        <!-- Cancel form with hidden confirmation field -->
+                        <form action="{% url 'cancel_appointment' appointment.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="confirm_cancel" value="True">
+                            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

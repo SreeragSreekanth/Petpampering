@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Browse Grooming Services</h2>
+
+    <form method="GET" class="mb-4 d-flex justify-content-center">
+        <input type="text" name="q" class="form-control w-50 me-2" placeholder="Search services..." value="{{ query }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    
+    <!-- AI-Powered Recommendations -->
+    {% if user.is_authenticated and recommended_services %}
+    <h3 class="mb-3">✨ Recommended for Your Pet ✨</h3>
+    <div class="row">
+        {% for service in recommended_services %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 h-100">
+                <!-- Service Image -->
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <img src="https://via.placeholder.com/300" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
+                {% endif %}
+
+                <!-- Service Details -->
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ service.name }}</h5>
+                    <p class="card-text"><strong>Pet Type:</strong> {{ service.pet_type }}</p>
+                    <p class="card-text"><strong>Price:</strong> ${{ service.price }}</p>
+                </div>
+
+                <!-- Buttons for View Details and View Groomer Profile -->
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                    <a href="{% url 'view_service' service.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                    <a href="{% url 'groomer_profile' service.groomer.id %}" class="btn btn-outline-secondary btn-sm">View Profile</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- All Services -->
+    <h3 class="mt-5">All Available Services</h3>
+    <div class="row">
+        {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 h-100">
+                <!-- Service Image -->
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <img src="https://via.placeholder.com/300" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
+                {% endif %}
+
+                <!-- Service Details -->
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ service.name }}</h5>
+                    <p class="card-text"><strong>Pet Type:</strong> {{ service.pet_type }}</p>
+                    <p class="card-text"><strong>Price:</strong> ${{ service.price }}</p>
+                </div>
+
+                <!-- Buttons for View Details and View Groomer Profile -->
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
+                    <a href="{% url 'view_service' service.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                    <a href="{% url 'groomer_profile' service.groomer.id %}" class="btn btn-outline-secondary btn-sm">View Profile</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted text-center mt-4">No services available at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,10 @@ from django.contrib.auth.decorators import login_required
 from .models import GroomerProfile, Service, Appointment
 from .forms import GroomerProfileForm, ServiceForm
 from django.contrib import messages
+from userauth.models import User
+from pet_owner.models import Feedback 
+from .forms import ResponseForm
+
 
 
 @login_required
@@ -11,6 +15,18 @@ def groomer_dashboard(request):
     profile = get_object_or_404(GroomerProfile, user=request.user)
     services = Service.objects.filter(groomer=request.user)
     return render(request, 'groomer.html', {'profile': profile, 'services': services})
+
+
+def groomer_profile(request, groomer_id):
+    groomer = get_object_or_404(User, id=groomer_id, role='groomer')  
+    groomer_profile = get_object_or_404(GroomerProfile, user=groomer)  # Fetch Groomer's profile
+    services = Service.objects.filter(groomer=groomer)  # Fetch services offered by the groomer
+
+    return render(request, 'groomer_profile.html', {
+        'groomer': groomer,
+        'groomer_profile': groomer_profile,
+        'services': services
+    })
 
 @login_required
 def edit_profile(request):
@@ -81,11 +97,16 @@ def delete_service(request, service_id):
 
 @login_required
 def view_service(request, service_id):
-    # Retrieve the service based on the service_id
     service = get_object_or_404(Service, id=service_id)
+    
+    # Check if the user has already left feedback for this service
+    has_left_feedback = Feedback.objects.filter(service=service, pet_owner=request.user).exists()
 
-    # Render the service details page
-    return render(request, 'view_service.html', {'service': service})
+    return render(request, 'view_service.html', {
+        'service': service,
+        'has_left_feedback': has_left_feedback,
+    })
+
 
 @login_required
 def manage_appointments(request):
@@ -104,3 +125,32 @@ def update_appointment_status(request, appointment_id, status):
         messages.error(request, "Invalid status update.")
 
     return redirect('manage_appointments')
+
+
+@login_required
+def respond_to_feedback(request, feedback_id):
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+
+    # Ensure the logged-in user is the groomer of the service
+    if feedback.service.groomer != request.user:
+        messages.error(request, "You are not authorized to respond to this feedback.")
+        return redirect('view_service', service_id=feedback.service.id)
+
+    # Check if a response already exists
+    if hasattr(feedback, 'response'):
+        messages.error(request, "You have already responded to this feedback.")
+        return redirect('view_service', service_id=feedback.service.id)
+
+    if request.method == "POST":
+        form = ResponseForm(request.POST)
+        if form.is_valid():
+            response = form.save(commit=False)
+            response.feedback = feedback
+            response.groomer = request.user
+            response.save()
+            messages.success(request, "Your response has been submitted.")
+            return redirect('view_service', service_id=feedback.service.id)
+    else:
+        form = ResponseForm()  # Ensure form is passed even for GET requests
+
+    return render(request, "respond_to_feedback.html", {"form": form, "feedback": feedback})

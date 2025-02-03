@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-5">
@@ -8,9 +9,12 @@
         {% for pet in pets %}
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm">
-                {% if pet.pet_picture %}
+            {% if pet.pet_picture %}
                 <img src="{{ pet.pet_picture.url }}" class="card-img-top" alt="{{ pet.name }}">
-                {% endif %}
+            {% else %}
+                <img src="{% static 'assets/default.webp' %}" class="card-img-top" alt="Default Pet Image">
+            {% endif %}
+
                 <div class="card-body">
                     <h5 class="card-title">{{ pet.name }}</h5>
                     <p class="card-text">
@@ -19,7 +23,7 @@
                         <strong>Weight:</strong> {{ pet.weight }} kg<br>
                         <strong>Gender:</strong> {{ pet.gender }}
                     </p>
-                    <a href="{% url 'edit_pet' pet.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'edit_pet' pet.id %}" class="btn btn-primary btn-sm mb-3">Edit</a>
                     <a href="{% url 'delete_pet' pet.id %}" class="btn btn-danger btn-sm">Delete</a>
                 </div>
             </div>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Reschedule Appointment for {{ appointment.service.name }}</h2>
+
+    <!-- Display the current service and details -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold">{{ appointment.service.name }}</h5>
+            <p class="card-text"><strong>Offered by:</strong> {{ appointment.groomer.username }}</p>
+            <p class="card-text"><strong>Current Appointment Time:</strong> {{ appointment.date_time|date:"Y-m-d H:i" }}</p>
+        </div>
+    </div>
+
+    <!-- Appointment Reschedule Form -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}  <!-- Using Crispy Forms -->
+        
+        <button type="submit" class="btn btn-warning w-100">Reschedule Appointment</button>
+    </form>
+</div>
+{% endblock %}

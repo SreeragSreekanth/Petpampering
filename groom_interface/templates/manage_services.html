@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Pet Grooming{% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
                         {% if service.image %}
                             <img src="{{ service.image.url }}" class="img-fluid rounded mb-3" alt="{{ service.name }}">
                         {% else %}
-                            <img src="#" class="img-fluid rounded mb-3" alt="placeholder">
+                            <img src="{% static 'assets/default.webp' %}" class="img-fluid rounded mb-3" alt="placeholder">
                         {% endif %}
 
                         <!-- Truncate description to ensure all cards are the same size -->

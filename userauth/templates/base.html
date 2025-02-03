@@ -1,4 +1,6 @@
 {% load static %}
+{% load crispy_forms_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'userauth/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'groom_interface/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'pet_owner/css/style.css' %}">
 
 </head>
 <body class="bg-light">
@@ -64,7 +67,8 @@
                                             <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
                                         {% elif user.role == "owner" %}
                                             <li><a class="dropdown-item py-2" href="{% url 'owner_dashboard' %}"><i class="bi bi-house-heart me-2"></i>Profile</a></li>
-                                            <li><a class="dropdown-item py-2" href="#"><i class="bi bi-calendar-check me-2"></i> Book Appointment</a></li>
+                                            <li><a class="dropdown-item py-2" href="{% url 'view_appointments' %}"><i class="bi bi-calendar-check me-2"></i>Appointments</a></li>
+                                            <li><a class="dropdown-item py-2" href="{% url 'pet_list' %}"><i class="bi bi-calendar-check me-2"></i> My Pets</a></li>
                                             <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
                                         {% elif user.role == "admin" %}
                                             <li><a class="dropdown-item py-2" href="{% url 'admindash' %}"><i class="bi bi-house-heart me-2"></i> Dashboard</a></li>

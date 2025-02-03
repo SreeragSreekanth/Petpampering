@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="post-card">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content }}</p>
+            <p><strong>Posted by:</strong> {{ post.owner.username }} | <small>{{ post.created_at }}</small></p>
+        </div>
+
+        <hr>
+
+        <!-- Reply Form -->
+        <h4>Add a Reply</h4>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">Reply</button>
+        </form>
+
+        <hr>
+
+        <!-- Display Replies -->
+        <h4>Replies</h4>
+        {% for reply in replies %}
+            <div class="reply-card border rounded p-3 mb-2">
+                <p><strong>{{ reply.user.username }}</strong> <small>({{ reply.created_at }})</small></p>
+                <p>{{ reply.content }}</p>
+            </div>
+        {% empty %}
+            <p>No replies yet. Be the first to comment!</p>
+        {% endfor %}
+    </div>
+{% endblock %}
