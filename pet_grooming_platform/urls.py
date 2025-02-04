@@ -11,6 +11,7 @@ urlpatterns = [
     path('',include('admin_panel.urls')),
     path('',include('groom_interface.urls')),
     path('',include('pet_owner.urls')),
+    path('',include('grooming_session_tracker.urls')),
 
 ]
 if settings.DEBUG:

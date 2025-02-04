@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'userauth',
     'groom_interface',
     'pet_owner',
+    'grooming_session_tracker',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'grooming_session_tracker.context_processors.unread_notifications',
             ],
         },
     },

@@ -8,6 +8,8 @@ from django.contrib import messages
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from django.db.models import Q
+from grooming_session_tracker.utils import send_notification
+from grooming_session_tracker.models import Notification
 
 
 @login_required
@@ -63,8 +65,12 @@ def pet_list(request):
 def dashboard(request):
     profile = PetOwnerProfile.objects.get_or_create(user=request.user)[0]
     pets = Pet.objects.filter(owner=request.user)
-    return render(request, 'dashboard.html', {'profile': profile, 'pets': pets})
-
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
+    return render(request, 'dashboard.html', {
+        'profile': profile,
+        'pets': pets,
+        'notifications': notifications
+    })
 
 @login_required
 def browse_services(request):
@@ -164,6 +170,16 @@ def book_appointment(request, service_id):
 
             appointment.save()  # Save the appointment
 
+            # Send notifications to both parties
+            send_notification(
+                user=appointment.pet_owner,
+                message=f"Your appointment for {service.name} has been booked for {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
+            )
+            send_notification(
+                user=appointment.groomer,
+                message=f"A new appointment for {service.name} has been booked by {appointment.pet_owner.username} for {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
+            )
+
             return redirect('view_appointments')  # Redirect to a success page or dashboard
     else:
         form = AppointmentForm(user=request.user)
@@ -179,16 +195,33 @@ def view_appointments(request):
 def reschedule_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
 
-    # Ensure that the user is the pet owner or the groomer
-    if request.user != appointment.pet_owner and request.user != appointment.groomer:
-        return redirect('error_page')  # Redirect if the user is not authorized to reschedule the appointment
+    # Ensure that only the pet owner can reschedule
+    if request.user != appointment.pet_owner:
+        messages.error(request, "You are not authorized to reschedule this appointment.")
+        return redirect('error_page')
 
     if request.method == 'POST':
         form = RescheduleAppointmentForm(request.POST, instance=appointment)
         if form.is_valid():
-            form.save()  # Save the new rescheduled appointment
+            appointment = form.save(commit=False)
 
-            return redirect('view_appointments')  # Redirect to the appointment detail page after rescheduling
+            # Set status back to pending
+            appointment.status = "pending"
+            appointment.save()  # Save the rescheduled appointment
+
+            # Create notification for groomer
+            send_notification(
+                user=appointment.pet_owner,
+                message=f"Your appointment for {appointment.service.name} has been rescheduled to {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
+            )
+            send_notification(
+                user=appointment.groomer,
+                message=f"The appointment for {appointment.service.name} with {appointment.pet_owner.username} has been rescheduled to {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
+            )
+
+            messages.success(request, "Appointment rescheduled successfully.")
+            return redirect('view_appointments')  # Redirect after rescheduling
+
     else:
         form = RescheduleAppointmentForm(instance=appointment)
 
@@ -198,16 +231,22 @@ def reschedule_appointment(request, appointment_id):
 @login_required
 def cancel_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id, pet_owner=request.user)
-
     if request.method == 'POST':
-        confirm_cancel = request.POST.get('confirm_cancel')  # Get the confirmation field
+        confirm_cancel = request.POST.get('confirm_cancel')
+        if confirm_cancel:
+            # Send notifications to both parties
+            send_notification(
+                user=appointment.pet_owner,
+                message=f"Your appointment for {appointment.service.name} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been canceled."
+            )
+            send_notification(
+                user=appointment.groomer,
+                message=f"The appointment for {appointment.service.name} with {appointment.pet_owner.username} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been canceled."
+            )
 
-        if confirm_cancel:  # If confirmed, delete the appointment
             appointment.delete()
             messages.success(request, 'Your appointment has been cancelled successfully.')
-            return redirect('view_appointments')  # Redirect back to the appointments page
-    
-    # If the form is not submitted, just render the appointments page with a confirmation message
+            return redirect('view_appointments')
     messages.info(request, 'Are you sure you want to cancel this appointment?')
     return redirect('view_appointments')
 

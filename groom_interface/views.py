@@ -7,14 +7,33 @@ from django.contrib import messages
 from userauth.models import User
 from pet_owner.models import Feedback 
 from .forms import ResponseForm
+from grooming_session_tracker.utils import send_notification
+from grooming_session_tracker.models import Notification
 
 
 
 @login_required
 def groomer_dashboard(request):
+    # Fetch the groomer's profile
     profile = get_object_or_404(GroomerProfile, user=request.user)
+    
+    # Fetch services offered by the groomer
     services = Service.objects.filter(groomer=request.user)
-    return render(request, 'groomer.html', {'profile': profile, 'services': services})
+    
+    # Fetch unread notifications for the groomer
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
+    
+    # Mark notifications as read if requested
+    if request.GET.get('mark_as_read'):
+        notifications.update(is_read=True)
+        return redirect('groomer_dashboard')  # Redirect to refresh the page
+    
+    # Render the dashboard with profile, services, and notifications
+    return render(request, 'groomer.html', {
+        'profile': profile,
+        'services': services,
+        'notifications': notifications,
+    })
 
 
 def groomer_profile(request, groomer_id):
@@ -116,14 +135,33 @@ def manage_appointments(request):
 @login_required
 def update_appointment_status(request, appointment_id, status):
     appointment = get_object_or_404(Appointment, id=appointment_id, groomer=request.user)
-    
     if status in ["accepted", "declined"]:
         appointment.status = status
         appointment.save()
+
+        # Send notifications to both parties
+        if status == "accepted":
+            send_notification(
+                user=appointment.pet_owner,
+                message=f"Your appointment for {appointment.service.name} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been accepted."
+            )
+            send_notification(
+                user=appointment.groomer,
+                message=f"You have accepted the appointment for {appointment.service.name} with {appointment.pet_owner.username}."
+            )
+        elif status == "declined":
+            send_notification(
+                user=appointment.pet_owner,
+                message=f"Your appointment for {appointment.service.name} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been declined."
+            )
+            send_notification(
+                user=appointment.groomer,
+                message=f"You have declined the appointment for {appointment.service.name} with {appointment.pet_owner.username}."
+            )
+
         messages.success(request, f"Appointment has been {status}.")
     else:
         messages.error(request, "Invalid status update.")
-
     return redirect('manage_appointments')
 
 
