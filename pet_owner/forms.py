@@ -19,6 +19,8 @@ class PetForm(forms.ModelForm):
         model = Pet
         fields = ['name', 'pet_type','breed', 'age', 'weight', 'gender', 'grooming_preferences', 'health_information', 'pet_picture']
 
+        
+
 class AppointmentForm(forms.ModelForm):
     pet = forms.ModelChoiceField(queryset=Pet.objects.none())  # Filter pets for the logged-in user
     date_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))

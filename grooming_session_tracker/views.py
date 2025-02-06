@@ -4,6 +4,14 @@ from django.contrib import messages
 from .models import Notification, Payment, Invoice
 from grooming_session_tracker.utils import send_notification
 from groom_interface.models import Appointment
+from collections import defaultdict
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+import pdfkit
+import os
+
+
+WKHTMLTOPDF_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
 
 # Notifications
 @login_required
@@ -44,6 +52,7 @@ def pet_owner_expenses(request):
 
     # Collect the invoice details and payments for each appointment
     appointment_details = []
+
     for appointment in appointments:
         try:
             invoice = Invoice.objects.get(appointment=appointment)
@@ -59,28 +68,35 @@ def pet_owner_expenses(request):
 
     return render(request, 'pet_owner_expenses.html', {'appointment_details': appointment_details})
 
+
 @login_required
 def groomer_payments(request):
     user = request.user
     # Fetch all accepted appointments where the user is the groomer
-    appointments = Appointment.objects.filter(groomer=user, status='accepted')
+    appointments = Appointment.objects.filter(groomer=user, status='accepted').select_related("service")
 
-    # Collect the invoice details and payments for each appointment
+    # Store invoice details & payments
     appointment_details = []
+    earnings_summary = defaultdict(float)  # Keeps a default float value for missing keys
+
     for appointment in appointments:
-        try:
-            invoice = Invoice.objects.get(appointment=appointment)
+        invoice = Invoice.objects.filter(appointment=appointment).first()
+        if invoice:
             payments = Payment.objects.filter(invoice=invoice)
             appointment_details.append({
                 'appointment': appointment,
                 'invoice': invoice,
                 'payments': payments,
             })
-        except Invoice.DoesNotExist:
-            # Handle cases where no invoice exists for an appointment
-            pass
+            # Convert Decimal to float before adding
+            earnings_summary[appointment.service.name] += float(invoice.total_amount)
 
-    return render(request, 'groomer_payments.html', {'appointment_details': appointment_details})
+    context = {
+        "appointment_details": appointment_details,
+        "earnings_summary": dict(earnings_summary),  # Convert defaultdict to a regular dictionary
+    }
+    return render(request, "groomer_payments.html", context)
+
 
 @login_required
 def update_payment_status(request, appointment_id):
@@ -125,5 +141,24 @@ def update_payment_status(request, appointment_id):
     
     # If the request method is not POST, redirect back to the payments page
     return redirect('groomer_payments')
+
+
+def generate_invoice_pdf(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+
+    # Generate HTML content for PDF
+    html_content = render_to_string('invoice_pdf_template.html', {'invoice': invoice})
+
+    # Configure pdfkit with the correct wkhtmltopdf path
+    config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH) if os.name == "nt" else None
+
+    # Generate the PDF
+    pdf = pdfkit.from_string(html_content, False, configuration=config)
+
+    # Create HTTP response
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.id}.pdf"'
+    return response
+
 
 

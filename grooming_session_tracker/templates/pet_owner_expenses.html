@@ -18,6 +18,14 @@
                 {% endif %}
               </p>
               <p class="card-text"><strong>Invoice Created:</strong> {{ detail.invoice.created_at }}</p>
+              
+              <!-- 🔹 Generate Invoice Button - Only if Status is Paid -->
+              {% if detail.invoice.status == 'paid' %}
+                <a href="{% url 'generate_invoice_pdf' detail.invoice.id %}" class="btn btn-primary btn-sm mt-2">
+                  <i class="bi bi-file-earmark-pdf"></i> Generate Invoice
+                </a>
+              {% endif %}
+              
             </div>
           </div>
         </div>

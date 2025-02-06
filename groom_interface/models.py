@@ -10,7 +10,11 @@ class Service(models.Model):
     groomer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="services")
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0, message="Price cannot be less than 0.")]
+    )
     availability = models.BooleanField(default=True)
     image = models.ImageField(upload_to='services/', blank=True, null=True)
     pet_type = models.CharField(max_length=100, help_text="E.g., Dog, Cat, Rabbit, Bird")  # Updated field
@@ -25,7 +29,9 @@ class GroomerProfile(models.Model):
     bio = models.TextField(max_length=500, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='groomer_profiles/', blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
-    experience_years = models.IntegerField(default=0)
+    experience_years = models.PositiveIntegerField(
+        validators=[MinValueValidator(0, message="Experience years cannot be less than 0.")]
+    )
     services_offered = models.TextField(blank=True, null=True)
 
     def __str__(self):

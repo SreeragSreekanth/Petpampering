@@ -21,7 +21,7 @@ class Pet(models.Model):
     pet_type = models.CharField(max_length=100, help_text="E.g., Dog, Cat, Rabbit, Bird")  # New field for pet type
     breed = models.CharField(max_length=100, blank=True, null=True)
     age = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)])
-    weight = models.DecimalField(max_digits=5, decimal_places=2, help_text="Weight in kg")
+    weight = models.DecimalField(max_digits=5, decimal_places=2,validators=[MinValueValidator(0, message="Weight cannot be less than 0.")], help_text="Weight in kg")
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')])
     grooming_preferences = models.TextField(blank=True, null=True)
     health_information = models.TextField(blank=True, null=True)

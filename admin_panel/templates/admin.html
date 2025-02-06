@@ -1,44 +1,37 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}
-    Admin Dashboard
-{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Admin Dashboard</h1>
+<div class="container mt-5">
+    <h1 class="text-center fw-bold mb-4">Admin Dashboard</h1>
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">User Management</h5>
-                        <p class="card-text">Manage user accounts, approve or reject users, and assign roles.</p>
-                        <a href="{% url 'manage_users' %}" class="btn btn-primary">Manage Users</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Services</h5>
-                        <p class="card-text">View and manage grooming services offered on the platform.</p>
-                        <a href="{% url 'all_services' %}" class="btn btn-primary">Manage Services</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Feedback</h5>
-                        <p class="card-text">View and manage user feedback and ratings for services and groomers.</p>
-                        <a href="#" class="btn btn-primary">Manage Feedback</a>
-                    </div>
+    <div class="row g-4 justify-content-center">
+        <!-- User Management -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title fw-semibold">User Management</h5>
+                    <p class="card-text text-muted">Manage user accounts, approve or reject users, and assign roles.</p>
+                    <a href="{% url 'manage_users' %}" class="btn btn-primary w-100">Manage Users</a>
                 </div>
             </div>
         </div>
 
-        <!-- Add any other sections you need here -->
-
+        <!-- Services Management -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-cut fa-3x text-info mb-3"></i>
+                    <h5 class="card-title fw-semibold">Services Management</h5>
+                    <p class="card-text text-muted">View and manage grooming services offered on the platform.</p>
+                    <a href="{% url 'all_services' %}" class="btn btn-info w-100">Manage Services</a>
+                </div>
+            </div>
+        </div>
     </div>
+
+</div>
 {% endblock %}

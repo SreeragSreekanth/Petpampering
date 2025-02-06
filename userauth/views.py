@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignupForm, LoginForm
 from django.contrib import messages
 from .utils import clear_approval_for_superuser  # Import the function to clear approval for superuser
+from django.http import HttpResponse
+from django.views import View
 
 
 
@@ -77,5 +79,12 @@ def home_view(request):
     """Home View after successful login."""
     return render(request, 'home.html', {'user': request.user})  # Render user info in home page
 
+
+class TestView(View):
+    """
+    A simple view to test the middleware.
+    """
+    def get(self, request):
+        return HttpResponse("This is a test response.")
 
 
