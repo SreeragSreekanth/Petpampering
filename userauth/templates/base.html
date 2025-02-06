@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Google Fonts - Inter for a modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'userauth/css/style.css' %}">
@@ -41,19 +43,6 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% if user.is_authenticated and user.role in "groomer owner" %}
-                            <li class="nav-item">
-                                <a class="nav-link position-relative" href="{% url 'notifications' %}">
-                                    <i class="bi bi-bell fs-5"></i>
-                                    {% if unread_notifications_count > 0 %}
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            {{ unread_notifications_count }}
-                                        </span> 
-                                    {% endif %}
-                                    Notifications
-                                </a>
-                            </li>
-                        {% endif %}
                         {% if not user.is_authenticated %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'login' %}">
@@ -70,21 +59,34 @@
                                     {% if user.role == "groomer" %}
                                         <li><a class="dropdown-item py-2" href="{% url 'groomer_dashboard' %}"><i class="bi bi-person me-2"></i> Profile</a></li>
                                         <li><a class="dropdown-item py-2" href="{% url 'manage_appointments' %}"><i class="bi bi-calendar2-week me-2"></i> Appointments</a></li>
-                                        <li><a class="dropdown-item py-2" href="{% url 'manage_services' %}"><i class="bi bi-scissors me-2"></i> Services</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'groomer_payments' %}"><i class="bi bi-credit-card me-2"></i> Payments</a></li>
                                         <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
                                     {% elif user.role == "owner" %}
-                                        <li><a class="dropdown-item py-2" href="{% url 'owner_dashboard' %}"><i class="bi bi-house-heart me-2"></i>Profile</a></li>
-                                        <li><a class="dropdown-item py-2" href="{% url 'view_appointments' %}"><i class="bi bi-calendar-check me-2"></i>Appointments</a></li>
-                                        <li><a class="dropdown-item py-2" href="{% url 'pet_list' %}"><i class="bi bi-calendar-check me-2"></i> My Pets</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'owner_dashboard' %}"><i class="bi bi-house-heart me-2"></i> Profile</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'view_appointments' %}"><i class="bi bi-calendar-check me-2"></i> Appointments</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'pet_list' %}"><i class="bi bi-paw me-2"></i> My Pets</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'pet_owner_expenses' %}"><i class="bi bi-credit-card me-2"></i> Expenses</a></li>
                                         <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
                                     {% elif user.role == "admin" %}
-                                        <li><a class="dropdown-item py-2" href="{% url 'admindash' %}"><i class="bi bi-house-heart me-2"></i> Dashboard</a></li>
-                                        <li><a class="dropdown-item py-2" href="{% url 'manage_users' %}"><i class="bi bi-calendar-check me-2"></i> Manage Users</a></li>
-                                        <li><a class="dropdown-item py-2" href="{% url 'all_services' %}"><i class="bi bi-calendar-check me-2"></i> Manage Services</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'admindash' %}"><i class="bi bi-house-heart me-2"></i> Admin Dashboard</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'manage_users' %}"><i class="bi bi-people me-2"></i> Manage Users</a></li>
+                                        <li><a class="dropdown-item py-2" href="{% url 'all_services' %}"><i class="bi bi-scissors me-2"></i> Manage Services</a></li>
                                         <li><a class="dropdown-item py-2" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li>
                                     {% endif %}
                                     <!-- Notification Bell (Only for Groomers and Pet Owners) -->
-                                    
+                                    {% if user.is_authenticated and user.role in "groomer owner" %}
+                                        <li class="nav-item">
+                                            <a class="nav-link position-relative" href="{% url 'notifications' %}">
+                                                <i class="bi bi-bell fs-5"></i>
+                                                {% if unread_notifications_count > 0 %}
+                                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                        {{ unread_notifications_count }}
+                                                    </span> 
+                                                {% endif %}
+                                                Notifications
+                                            </a>
+                                        </li>
+                                    {% endif %}
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
                                 </ul>

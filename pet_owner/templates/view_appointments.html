@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="container mt-5">
     <h2 class="mb-4 text-center">Your Appointments</h2>
-
     <div class="row">
         {% for appointment in appointments %}
         <div class="col-md-6 mb-4">
@@ -12,18 +10,34 @@
                     <h5 class="card-title fw-bold">{{ appointment.service.name }}</h5>
                     <p class="card-text"><strong>Groomer:</strong> {{ appointment.groomer.username }}</p>
                     <p class="card-text"><strong>Date & Time:</strong> {{ appointment.date_time }}</p>
-                    <p class="card-text"><strong>Status:</strong> {{ appointment.status }}</p>
+                    <p class="card-text"><strong>Status:</strong> 
+                        {% if appointment.status == 'accepted' %}
+                            <span class="badge bg-success">{{ appointment.status|title }}</span>
+                        {% elif appointment.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">{{ appointment.status|title }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ appointment.status|title }}</span>
+                        {% endif %}
+                    </p>
                     
                     <!-- Button group with flex to align buttons -->
                     <div class="d-flex justify-content-between">
                         <!-- Reschedule button -->
                         <a href="{% url 'reschedule_appointment' appointment.id %}" class="btn btn-warning btn-sm">Reschedule</a>
-
+                        
                         <!-- Cancel form with hidden confirmation field -->
                         <form action="{% url 'cancel_appointment' appointment.id %}" method="POST" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="confirm_cancel" value="True">
-                            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                            <button 
+                                type="submit" 
+                                class="btn btn-danger btn-sm"
+                                {% if appointment.status == 'accepted' %}
+                                    disabled
+                                {% endif %}
+                            >
+                                Cancel
+                            </button>
                         </form>
                     </div>
                 </div>

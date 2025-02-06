@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1 class="text-center mb-4">Your Payments</h1>
+  {% if appointment_details %}
+    <div class="row">
+      {% for detail in appointment_details %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Appointment for {{ detail.appointment.service.name }}</h5>
+              <p class="card-text"><strong>Date & Time:</strong> {{ detail.appointment.date_time }}</p>
+              <p class="card-text"><strong>Total Amount:</strong> ${{ detail.invoice.total_amount }}</p>
+              <p class="card-text"><strong>Status:</strong> {{ detail.invoice.status|title }}</p>
+              <p class="card-text"><strong>Invoice Created:</strong> {{ detail.invoice.created_at }}</p>
+              
+              <h6 class="card-subtitle mb-2 text-muted">Payments:</h6>
+              <ul class="list-group list-group-flush">
+                {% for payment in detail.invoice.payments.all %}
+                  <li class="list-group-item">
+                    <strong>Amount Paid:</strong> ${{ payment.amount }}<br>
+                    <small><strong>Paid By:</strong> {{ payment.paid_by.username }}</small><br>
+                    <small><strong>Date Paid:</strong> {{ payment.date_paid }}</small>
+                  </li>
+                {% endfor %}
+              </ul>
+
+              <!-- Mark as Paid Button -->
+              {% if detail.invoice.status != 'paid' %}
+                <form method="post" action="{% url 'update_payment_status' detail.appointment.id %}" class="mt-3">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary btn-sm">Mark as Paid</button>
+                </form>
+              {% else %}
+                <p class="text-success mt-3"><i class="bi bi-check-circle-fill"></i> This invoice has already been marked as paid.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center" role="alert">
+      You haven't received any payments yet.
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,13 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignupForm, LoginForm
-from .models import User
 from django.contrib import messages
 from .utils import clear_approval_for_superuser  # Import the function to clear approval for superuser
 
 
 
+
+# Define a function called signup_view that takes in a request as an argument
 def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -75,3 +76,6 @@ def logout_view(request):
 def home_view(request):
     """Home View after successful login."""
     return render(request, 'home.html', {'user': request.user})  # Render user info in home page
+
+
+

@@ -9,7 +9,9 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from django.db.models import Q
 from grooming_session_tracker.utils import send_notification
-from grooming_session_tracker.models import Notification
+from grooming_session_tracker.models import Notification, Invoice, Payment
+from django.utils import timezone
+
 
 
 @login_required
@@ -143,47 +145,39 @@ def browse_services(request):
         "query": query,
     })
 
-
-
-
 @login_required
 def book_appointment(request, service_id):
     service = get_object_or_404(Service, id=service_id)
-
-    # Ensure that the logged-in user has a pet
     pet = Pet.objects.filter(owner=request.user).first()
     if not pet:
-        return redirect('error_page')  # Redirect to error page if the user doesn't have a pet
+        return redirect('error_page')
 
     if request.method == 'POST':
         form = AppointmentForm(request.POST, user=request.user)
         if form.is_valid():
             appointment = form.save(commit=False)
-            
-            # Set the groomer (from the service) and pet_owner (from the logged-in user)
-            appointment.groomer = service.groomer  # Set the groomer from the service
-            appointment.pet_owner = request.user  # Set the pet owner to the logged-in user
-            appointment.service = service  # Ensure the service is set
-            
-            # Set the pet for the appointment
-            appointment.pet = pet  # Set the pet to the first pet owned by the logged-in user
+            appointment.groomer = service.groomer
+            appointment.pet_owner = request.user
+            appointment.service = service
+            appointment.pet = pet
+            appointment.save()
 
-            appointment.save()  # Save the appointment
-
-            # Send notifications to both parties
-            send_notification(
-                user=appointment.pet_owner,
-                message=f"Your appointment for {service.name} has been booked for {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
-            )
-            send_notification(
-                user=appointment.groomer,
-                message=f"A new appointment for {service.name} has been booked by {appointment.pet_owner.username} for {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
+            # ✅ Create an Invoice for this appointment
+            invoice = Invoice.objects.create(
+                appointment=appointment,
+                total_amount=service.price,  # Use 'total_amount' if your model has it
+                status='pending'
             )
 
-            return redirect('view_appointments')  # Redirect to a success page or dashboard
+
+            # Send notifications
+            send_notification(user=appointment.groomer, message=f"A new appointment has been booked.")
+            send_notification(user=appointment.pet_owner, message=f"Your appointment has been booked.")
+
+            return redirect('view_appointments')
+
     else:
         form = AppointmentForm(user=request.user)
-
     return render(request, 'book_appointment.html', {'form': form, 'service': service})
 
 @login_required
@@ -191,62 +185,57 @@ def view_appointments(request):
     appointments = Appointment.objects.filter(pet_owner=request.user)
     return render(request, 'view_appointments.html', {'appointments': appointments})
 
+# views.py (pet_owner/views.py)
 @login_required
 def reschedule_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
-
     # Ensure that only the pet owner can reschedule
     if request.user != appointment.pet_owner:
         messages.error(request, "You are not authorized to reschedule this appointment.")
         return redirect('error_page')
-
     if request.method == 'POST':
         form = RescheduleAppointmentForm(request.POST, instance=appointment)
         if form.is_valid():
             appointment = form.save(commit=False)
-
             # Set status back to pending
             appointment.status = "pending"
             appointment.save()  # Save the rescheduled appointment
-
-            # Create notification for groomer
+            # Send notifications
+            send_notification(
+                user=appointment.groomer,
+                message=f"Appointment for {appointment.service.name} has been rescheduled to {appointment.date_time.strftime('%Y-%m-%d %H:%M')}. Please review."
+            )
             send_notification(
                 user=appointment.pet_owner,
                 message=f"Your appointment for {appointment.service.name} has been rescheduled to {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
             )
-            send_notification(
-                user=appointment.groomer,
-                message=f"The appointment for {appointment.service.name} with {appointment.pet_owner.username} has been rescheduled to {appointment.date_time.strftime('%Y-%m-%d %H:%M')}."
-            )
-
             messages.success(request, "Appointment rescheduled successfully.")
-            return redirect('view_appointments')  # Redirect after rescheduling
-
+            return redirect('view_appointments')
     else:
         form = RescheduleAppointmentForm(instance=appointment)
-
     return render(request, 'reschedule_appointment.html', {'form': form, 'appointment': appointment})
 
 
+# views.py (pet_owner/views.py)
 @login_required
 def cancel_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id, pet_owner=request.user)
     if request.method == 'POST':
-        confirm_cancel = request.POST.get('confirm_cancel')
-        if confirm_cancel:
-            # Send notifications to both parties
-            send_notification(
-                user=appointment.pet_owner,
-                message=f"Your appointment for {appointment.service.name} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been canceled."
-            )
-            send_notification(
-                user=appointment.groomer,
-                message=f"The appointment for {appointment.service.name} with {appointment.pet_owner.username} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been canceled."
-            )
-
+        confirm_cancel = request.POST.get('confirm_cancel')  # Get the confirmation field
+        if confirm_cancel:  # If confirmed, delete the appointment
             appointment.delete()
             messages.success(request, 'Your appointment has been cancelled successfully.')
+            # Send notifications
+            send_notification(
+                user=appointment.groomer,
+                message=f"Appointment for {appointment.service.name} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been cancelled."
+            )
+            send_notification(
+                user=appointment.pet_owner,
+                message=f"Your appointment for {appointment.service.name} on {appointment.date_time.strftime('%Y-%m-%d %H:%M')} has been cancelled."
+            )
             return redirect('view_appointments')
+    # If the form is not submitted, just render the appointments page with a confirmation message
     messages.info(request, 'Are you sure you want to cancel this appointment?')
     return redirect('view_appointments')
 
@@ -290,15 +279,14 @@ def view_community_post(request, post_id):
     return render(request, "view_community_post.html", {"post": post, "replies": replies, "form": form})
 
 
+# views.py (pet_owner/views.py)
 @login_required
 def leave_feedback(request, service_id):
     service = get_object_or_404(Service, id=service_id)
-
     # Check if the user has already left feedback for this service
     if Feedback.objects.filter(service=service, pet_owner=request.user).exists():
         messages.error(request, "You have already left feedback for this service.")
         return redirect('view_service', service_id=service.id)
-
     if request.method == "POST":
         form = FeedbackForm(request.POST)
         if form.is_valid():
@@ -307,10 +295,14 @@ def leave_feedback(request, service_id):
             feedback.service = service
             feedback.save()
             messages.success(request, "Your feedback has been submitted.")
+            # Send notification to the groomer
+            send_notification(
+                user=service.groomer,
+                message=f"New feedback on your service {service.name}: {feedback.comment[:50]}..."
+            )
             return redirect('view_service', service_id=service.id)
     else:
         form = FeedbackForm()  # Ensure form is passed even for GET requests
-
     return render(request, "leave_feedback.html", {"service": service, "form": form})
 
 

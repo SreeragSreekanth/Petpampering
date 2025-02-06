@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
+from django.core.validators import MinLengthValidator
 
 # Signup Form
 class SignupForm(UserCreationForm):
@@ -11,7 +12,8 @@ class SignupForm(UserCreationForm):
     )
     phone_number = forms.CharField(
         required=False,
-        max_length=15,
+        max_length=10,
+        validators=[MinLengthValidator(10)],
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Optional'}),
         help_text=""
     )
