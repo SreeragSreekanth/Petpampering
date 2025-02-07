@@ -13,6 +13,7 @@ urlpatterns = [
     path('groomer/payments/', views.groomer_payments, name='groomer_payments'),
     path('update_payment_status/<int:appointment_id>/', views.update_payment_status, name='update_payment_status'),
     path('invoice/<int:invoice_id>/pdf/', views.generate_invoice_pdf, name='generate_invoice_pdf'),
+    path('invoice/<int:invoice_id>/view/', views.view_invoice_pdf, name='view_invoice_pdf'),
 
     
 ]

@@ -6,20 +6,25 @@ from django.contrib import messages
 from groom_interface.models import *
 from groom_interface.forms import *
 from django.contrib import messages
-
+from userauth.decorators import  superuser_required
 
 
 @login_required
+@superuser_required
 def manage_users(request):
     if not request.user.is_superuser:  # Check if the user is admin
         return redirect('home') 
     users = User.objects.filter(is_approved=True,role__in=['owner', 'groomer'])
     return render(request, 'manage_user/manage_users.html', {'users': users})
 
+@login_required
+@superuser_required
+
 def admindash(request):
     return render(request,"admin.html")
 
 @login_required
+@superuser_required
 def pending_users(request):
     """View all users awaiting approval."""
     if not request.user.is_superuser:
@@ -29,6 +34,7 @@ def pending_users(request):
     return render(request, 'manage_user/pending_users.html', {'pending_users': pending_users})
 
 @login_required
+@superuser_required
 def approve_user(request, user_id):
     if request.method == "POST":
         user = get_object_or_404(User, id=user_id)
@@ -49,6 +55,7 @@ def approve_user(request, user_id):
 
 
 @login_required
+@superuser_required
 def delete_user(request, user_id):
     """Delete a user from the system."""
     if not request.user.is_superuser:
@@ -59,7 +66,9 @@ def delete_user(request, user_id):
     messages.success(request, f"{user.username} has been deleted!")
     return redirect('manage_users')  # Redirect back to manage users page
 
+
 @login_required
+@superuser_required
 def reject_user(request, user_id):
     """Reject a user by deleting the account."""
     user = get_object_or_404(User, id=user_id)
@@ -71,6 +80,7 @@ def reject_user(request, user_id):
 
 
 @login_required
+@superuser_required
 def all_services(request):
     """ Display all grooming services with groomer details. """
     services = Service.objects.select_related('groomer').all()

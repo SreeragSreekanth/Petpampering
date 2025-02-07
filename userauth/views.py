@@ -79,6 +79,9 @@ def home_view(request):
     """Home View after successful login."""
     return render(request, 'home.html', {'user': request.user})  # Render user info in home page
 
+def custom_403(request, exception=None):
+    return render(request, '403.html', status=403)
+
 
 class TestView(View):
     """

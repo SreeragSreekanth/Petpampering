@@ -9,27 +9,25 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 import pdfkit
 import os
+from userauth.decorators import role_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 
 
 WKHTMLTOPDF_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
 
 # Notifications
 @login_required
+@role_required(['owner','groomer'])
 def notification_list(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'notifications.html', {'notifications': notifications})
 
-# Mark Notification as Read
-@login_required
-
-# Notifications
-@login_required
-def notification_list(request):
-    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'notifications.html', {'notifications': notifications})
 
 # Mark Notification as Read
 @login_required
+@role_required(['owner','groomer'])
 def mark_notification_as_read(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.is_read = True
@@ -39,18 +37,18 @@ def mark_notification_as_read(request, notification_id):
 
 # Mark All Notifications as Read
 @login_required
+@role_required(['owner','groomer'])
 def mark_all_as_read(request):
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     messages.success(request, 'All notifications marked as read')
     return redirect('notifications')  # Redirect back to the notifications page
 
 @login_required
+@role_required(['owner'])
 def pet_owner_expenses(request):
     user = request.user
-    # Fetch all accepted appointments where the user is the pet owner
     appointments = Appointment.objects.filter(pet_owner=user, status='accepted')
 
-    # Collect the invoice details and payments for each appointment
     appointment_details = []
 
     for appointment in appointments:
@@ -63,21 +61,31 @@ def pet_owner_expenses(request):
                 'payments': payments,
             })
         except Invoice.DoesNotExist:
-            # Handle cases where no invoice exists for an appointment
             pass
+
+    # ✅ Pagination
+    paginator = Paginator(appointment_details, 6)  # Show 6 per page
+    page = request.GET.get('page')
+    try:
+        appointment_details = paginator.page(page)
+    except PageNotAnInteger:
+        appointment_details = paginator.page(1)
+    except EmptyPage:
+        appointment_details = paginator.page(paginator.num_pages)
 
     return render(request, 'pet_owner_expenses.html', {'appointment_details': appointment_details})
 
 
+
+
 @login_required
+@role_required(['groomer'])
 def groomer_payments(request):
     user = request.user
-    # Fetch all accepted appointments where the user is the groomer
     appointments = Appointment.objects.filter(groomer=user, status='accepted').select_related("service")
 
-    # Store invoice details & payments
     appointment_details = []
-    earnings_summary = defaultdict(float)  # Keeps a default float value for missing keys
+    earnings_summary = defaultdict(float)
 
     for appointment in appointments:
         invoice = Invoice.objects.filter(appointment=appointment).first()
@@ -88,17 +96,29 @@ def groomer_payments(request):
                 'invoice': invoice,
                 'payments': payments,
             })
-            # Convert Decimal to float before adding
-            earnings_summary[appointment.service.name] += float(invoice.total_amount)
+            if invoice.status == "paid":
+                earnings_summary[appointment.service.name] += float(invoice.total_amount)
+
+    # ✅ Pagination
+    paginator = Paginator(appointment_details, 6)  # Show 6 per page
+    page = request.GET.get('page')
+    try:
+        appointment_details = paginator.page(page)
+    except PageNotAnInteger:
+        appointment_details = paginator.page(1)
+    except EmptyPage:
+        appointment_details = paginator.page(paginator.num_pages)
 
     context = {
         "appointment_details": appointment_details,
-        "earnings_summary": dict(earnings_summary),  # Convert defaultdict to a regular dictionary
+        "earnings_summary": dict(earnings_summary),
     }
     return render(request, "groomer_payments.html", context)
 
 
+
 @login_required
+@role_required(['groomer'])
 def update_payment_status(request, appointment_id):
     # Fetch the appointment object or return a 404 error if not found
     appointment = get_object_or_404(Appointment, id=appointment_id)
@@ -160,5 +180,26 @@ def generate_invoice_pdf(request, invoice_id):
     response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.id}.pdf"'
     return response
 
+
+def view_invoice_pdf(request, invoice_id):
+    invoice = Invoice.objects.get(id=invoice_id)
+    html_content = render_to_string('invoice_pdf_template.html', {'invoice': invoice})
+
+    # Configure PDF generation settings
+    options = {
+        'page-size': 'A4',
+        'encoding': 'UTF-8',
+    }
+
+    # Get wkhtmltopdf path from settings or manually define it
+    pdfkit_config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_PATH)
+
+    # Generate PDF in-memory
+    pdf = pdfkit.from_string(html_content, False, options=options, configuration=pdfkit_config)
+
+    # Return response with inline display instead of download
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="invoice_{invoice_id}.pdf"'
+    return response
 
 

@@ -2,7 +2,9 @@
 {% block content %}
 <div class="container mt-5">
     <h2 class="mb-4 text-center">Your Appointments</h2>
-    <div class="row">
+
+    <!-- Scrollable Container using Bootstrap -->
+    <div class="row overflow-auto vh-50">
         {% for appointment in appointments %}
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-0 rounded-4">
@@ -19,13 +21,11 @@
                             <span class="badge bg-secondary">{{ appointment.status|title }}</span>
                         {% endif %}
                     </p>
-                    
-                    <!-- Button group with flex to align buttons -->
+
+                    <!-- Button group -->
                     <div class="d-flex justify-content-between">
-                        <!-- Reschedule button -->
                         <a href="{% url 'reschedule_appointment' appointment.id %}" class="btn btn-warning btn-sm">Reschedule</a>
-                        
-                        <!-- Cancel form with hidden confirmation field -->
+
                         <form action="{% url 'cancel_appointment' appointment.id %}" method="POST" style="display: inline;">
                             {% csrf_token %}
                             <input type="hidden" name="confirm_cancel" value="True">

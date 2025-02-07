@@ -19,6 +19,11 @@
               </p>
               <p class="card-text"><strong>Invoice Created:</strong> {{ detail.invoice.created_at }}</p>
               
+
+              {% if detail.invoice.status == 'paid' %}
+                  <a href="{% url 'view_invoice_pdf' detail.invoice.id %}" target="_blank" class="btn btn-primary">View Invoice PDF</a>
+              {% endif %}
+
               <!-- 🔹 Generate Invoice Button - Only if Status is Paid -->
               {% if detail.invoice.status == 'paid' %}
                 <a href="{% url 'generate_invoice_pdf' detail.invoice.id %}" class="btn btn-primary btn-sm mt-2">
@@ -36,4 +41,33 @@
       You don't have any expenses recorded yet.
     </div>
   {% endif %}
+  <!-- Pagination Controls -->
+  <div class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+      {% if appointment_details.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1">&laquo; First</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ appointment_details.previous_page_number }}">Previous</a>
+        </li>
+      {% endif %}
+
+      <li class="page-item active">
+        <span class="page-link">
+          Page {{ appointment_details.number }} of {{ appointment_details.paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if appointment_details.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ appointment_details.next_page_number }}">Next</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ appointment_details.paginator.num_pages }}">Last &raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+
 {% endblock %}

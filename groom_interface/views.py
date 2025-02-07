@@ -9,10 +9,12 @@ from pet_owner.models import Feedback
 from .forms import ResponseForm
 from grooming_session_tracker.utils import send_notification
 from grooming_session_tracker.models import Notification,Invoice,Payment
+from userauth.decorators import role_required
 
 
 
 @login_required
+@role_required(['groomer'])
 def groomer_dashboard(request):
     # Fetch the groomer's profile
     profile = get_object_or_404(GroomerProfile, user=request.user)
@@ -35,7 +37,7 @@ def groomer_dashboard(request):
         'notifications': notifications,
     })
 
-
+@role_required(['groomer','admin'])
 def groomer_profile(request, groomer_id):
     groomer = get_object_or_404(User, id=groomer_id, role='groomer')  
     groomer_profile = get_object_or_404(GroomerProfile, user=groomer)  # Fetch Groomer's profile
@@ -48,6 +50,7 @@ def groomer_profile(request, groomer_id):
     })
 
 @login_required
+@role_required(['groomer'])
 def edit_profile(request):
     profile = get_object_or_404(GroomerProfile, user=request.user)
     if request.method == 'POST':
@@ -60,11 +63,13 @@ def edit_profile(request):
     return render(request, 'edit_profile.html', {'form': form})
 
 @login_required
+@role_required(['groomer'])
 def manage_services(request):
     services = Service.objects.filter(groomer=request.user)
     return render(request, 'manage_services.html', {'services': services})
 
 @login_required
+@role_required(['groomer'])
 def add_service(request):
     if request.method == 'POST':
         form = ServiceForm(request.POST, request.FILES)  # Include request.FILES to handle image uploads
@@ -79,6 +84,7 @@ def add_service(request):
     return render(request, 'add_service.html', {'form': form})
 
 @login_required
+@role_required(['groomer'])
 def edit_service(request, service_id):
     # Get the service that matches the ID and belongs to the current groomer
     service = get_object_or_404(Service, id=service_id, groomer=request.user)
@@ -128,6 +134,7 @@ def view_service(request, service_id):
 
 
 @login_required
+@role_required(['groomer'])
 def manage_appointments(request):
     appointments = Appointment.objects.filter(groomer=request.user).order_by('-date_time')
     return render(request, 'manage_appointments.html', {'appointments': appointments})
@@ -135,6 +142,7 @@ def manage_appointments(request):
 
 
 @login_required
+@role_required(['groomer'])
 def update_appointment_status(request, appointment_id, status):
     appointment = get_object_or_404(Appointment, id=appointment_id, groomer=request.user)
     if status in ["accepted", "declined"]:
@@ -153,6 +161,7 @@ def update_appointment_status(request, appointment_id, status):
 
 # views.py (groom_interface/views.py)
 @login_required
+@role_required(['groomer'])
 def respond_to_feedback(request, feedback_id):
     feedback = get_object_or_404(Feedback, id=feedback_id)
     # Ensure the logged-in user is the groomer of the service

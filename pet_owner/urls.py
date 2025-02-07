@@ -16,8 +16,12 @@ urlpatterns = [
     path('cancel-appointment/<int:appointment_id>/', views.cancel_appointment, name='cancel_appointment'),
     path('community/', views.community_posts, name='community_posts'),
     path('community/create/', views.create_community_post, name='create_community_post'),
+    path("community/<int:post_id>/edit/", views.edit_community_post, name="edit_community_post"),
+    path("community/<int:post_id>/delete/", views.delete_community_post, name="delete_community_post"),
     path('community/<int:post_id>/', views.view_community_post, name='view_post'),
     path('myservice/<int:service_id>/feedback/', views.leave_feedback, name='leave_feedback'),
     path('feedback/edit/<int:feedback_id>/', views.edit_feedback, name='edit_feedback'),
     path('feedback/delete/<int:feedback_id>/', views.delete_feedback, name='delete_feedback'),
+    path('reply/<int:reply_id>/edit/', views.edit_reply, name='edit_reply'),
+    path('reply/<int:reply_id>/delete/', views.delete_reply, name='delete_reply'),
 ]
