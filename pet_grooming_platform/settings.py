@@ -55,8 +55,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',  # Must come first
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'userauth.middleware.LoggingMiddleware',
     'userauth.middleware.PreventBackButtonMiddleware',
+    'userauth.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'pet_grooming_platform.urls'

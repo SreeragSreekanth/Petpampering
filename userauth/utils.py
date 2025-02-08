@@ -5,3 +5,6 @@ def clear_approval_for_superuser(user):
     if user.is_superuser:
         user.is_approved = True
         user.save()
+
+
+
