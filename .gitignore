@@ -24,3 +24,16 @@ env/
 *.tmp
 *.swp
 *.swo
+
+*.egg-info/
+dist/
+build/
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+
+.env
+.env.local
