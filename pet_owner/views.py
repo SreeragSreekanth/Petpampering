@@ -15,6 +15,7 @@ from userauth.decorators import role_required
 from django.http import HttpResponseForbidden
 from .models import Reply
 from django.db.models.functions import Lower
+from userauth.models import User
 
 
 
@@ -423,3 +424,14 @@ def delete_reply(request, reply_id):
     messages.success(request, "Reply deleted successfully.")
 
     return redirect('view_post', post_id=post_id)
+
+
+@login_required
+def view_pet_owner(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+
+    # Fetch pets owned by this pet owner
+    pets = Pet.objects.filter(owner=user)
+
+    return render(request, 'view_pet_owner.html', {'user': user, 'pets': pets})

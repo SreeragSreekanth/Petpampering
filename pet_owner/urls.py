@@ -24,4 +24,6 @@ urlpatterns = [
     path('feedback/delete/<int:feedback_id>/', views.delete_feedback, name='delete_feedback'),
     path('reply/<int:reply_id>/edit/', views.edit_reply, name='edit_reply'),
     path('reply/<int:reply_id>/delete/', views.delete_reply, name='delete_reply'),
+    path('view_pet_owner/<int:user_id>/', views.view_pet_owner, name='view_pet_owner'),
+
 ]

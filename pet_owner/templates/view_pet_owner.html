@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Pet Owner Profile - {{ user.first_name }} {{ user.last_name }} {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary fw-bold">Pet Owner Profile</h2>
+    
+    <!-- Pet Owner Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+            <h4 class="card-title fw-bold">{{ user.first_name }} {{ user.last_name }}</h4>
+            <p class="card-text">
+                <i class="bi bi-person-circle text-secondary"></i> <strong>Username:</strong> {{ user.username }} <br>
+                <i class="bi bi-envelope text-secondary"></i> <strong>Email:</strong> {{ user.email }} <br>
+                <i class="bi bi-person-badge text-secondary"></i> <strong>Role:</strong> Pet Owner
+            </p>
+        </div>
+    </div>
+
+    <!-- Pets Section -->
+    <h3 class="mt-5 text-center text-success fw-bold">Pets</h3>
+    <div class="row justify-content-center">
+        {% for pet in pets %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-img-top text-center">
+                    {% if pet.pet_picture %}
+                        <img src="{{ pet.pet_picture.url }}" class="img-fluid rounded" style="height: 250px; width: 100%; object-fit: cover;" alt="{{ pet.name }}">
+                    {% else %}
+                        <img src="{% static 'assets/default.webp' %}" class="img-fluid rounded" style="height: 250px; width: 100%; object-fit: cover;" alt="Default Pet Image">
+                    {% endif %}
+                </div>
+
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold">{{ pet.name }}</h5>
+                    <p class="card-text text-muted">
+                        <i class="bi bi-patch-question text-secondary"></i> <strong>Breed:</strong> {{ pet.breed }}<br>
+                        <i class="bi bi-calendar text-secondary"></i> <strong>Age:</strong> {{ pet.age }} years<br>
+                        <i class="bi bi-box text-secondary"></i> <strong>Weight:</strong> {{ pet.weight }} kg<br>
+                        <i class="bi bi-gender-ambiguous text-secondary"></i> <strong>Gender:</strong> {{ pet.gender }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <p class="text-muted text-center">No pets found for this user.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a href="{% url 'manage_users' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Users
+        </a>
+    </div>
+</div>
+{% endblock %}
