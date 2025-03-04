@@ -6,7 +6,11 @@
     <!-- Groomer Profile Section -->
     <div class="card shadow-lg border-0 rounded-4 text-center p-4 mb-5">
         <div class="profile-picture-container mx-auto">
-            <img src="{{ groomer_profile.profile_picture.url }}" class="profile-img" alt="Groomer Profile Picture" style="width: 200px; height: 200px; object-fit: cover;">
+            {% if profile.profile_picture and profile.profile_picture.name %}
+                <img src="{{ groomer_profile.profile_picture.url }}" class="profile-img" alt="Groomer Profile Picture" style="width: 200px; height: 200px; object-fit: cover;">
+            {% else %}
+                <img src="{% static 'assets/default.webp' %}"  class="profile-img" alt="Groomer Profile Picture" style="width: 200px; height: 200px; object-fit: cover;">
+            {% endif %}
         </div>
         <h2 class="fw-bold mt-3">{{ groomer.first_name }} {{ groomer.last_name }}</h2>
         <p class="text-muted">@{{ groomer.username }}</p>
@@ -33,7 +37,7 @@
                     {% endif %}
 
                     <p class="card-text">{{ service.description }}</p>
-                    <p><strong>Price:</strong> ${{ service.price }}</p>
+                    <p><strong>Price:</strong> ₹{{ service.price }}</p>
 
                     <!-- Conditionally display the 'Book Now' button for customers only -->
                     {% if user.is_authenticated and user != groomer and not user.is_staff %}

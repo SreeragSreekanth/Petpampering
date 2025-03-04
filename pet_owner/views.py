@@ -28,7 +28,7 @@ def profile_management(request):
         form = PetOwnerProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect('profile_management')
+            return redirect('owner_dashboard')
     else:
         form = PetOwnerProfileForm(instance=profile)
     return render(request, 'profile_management.html', {'form': form})

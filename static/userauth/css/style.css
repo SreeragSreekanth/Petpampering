@@ -1,0 +1,58 @@
+.navbar {
+    background-color: #007bff !important;
+}
+
+.nav-item .nav-link {
+    color: white !important;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.nav-item .nav-link:hover {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 5px;
+}
+
+.nav-link .bi-bell {
+    color: white;
+    transition: transform 0.2s ease;
+}
+
+.nav-link:hover .bi-bell {
+    transform: scale(1.1);
+    color: white;
+}
+
+.badge {
+    z-index: 1;
+    transition: all 0.2s ease;
+    border: 1px solid #fff; /* Optional: adds contrast */
+}
+
+.nav-link:hover .badge {
+    transform: scale(1.1);
+    background-color: #dc3545;
+}
+
+/* Ensure dropdown items have proper hover */
+.dropdown-item {
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+    .nav-item .nav-link {
+        padding: 0.5rem 1rem;
+    }
+    
+    .navbar-nav {
+        padding: 1rem 0;
+    }
+}

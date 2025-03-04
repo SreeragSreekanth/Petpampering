@@ -29,7 +29,7 @@ class GroomerProfile(models.Model):
     bio = models.TextField(max_length=500, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='groomer_profiles/', blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
-    experience_years = models.PositiveIntegerField(
+    experience_years = models.PositiveIntegerField(default=0,
         validators=[MinValueValidator(0, message="Experience years cannot be less than 0.")]
     )
     services_offered = models.TextField(blank=True, null=True)

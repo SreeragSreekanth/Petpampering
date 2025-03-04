@@ -8,7 +8,7 @@ class User(AbstractUser):
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='owner')
     is_approved = models.BooleanField(default=False)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)  # New field added
+    phone_number = models.CharField(max_length=10)  # New field added
     
 
     def __str__(self):

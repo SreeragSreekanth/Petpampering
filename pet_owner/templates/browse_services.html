@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-5">
@@ -20,7 +21,7 @@
                 {% if service.image %}
                     <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
                 {% else %}
-                    <img src="https://via.placeholder.com/300" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
+                    <img src="{% static 'assets/default.webp' %}" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
                 {% endif %}
 
                 <!-- Service Details -->

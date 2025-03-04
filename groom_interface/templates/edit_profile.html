@@ -1,41 +1,47 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
-{% block title %}Pet Grooming{% endblock %}
-
+{% block title %}Edit Groomer Profile - PawPerfect{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">✏️ Edit Profile</h2>
+    <div class="container mt-4">
+        <h2 class="text-center">✏️ Edit Profile</h2>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body">
-                <div class="mb-3">
-                    <label for="bio" class="form-label">Bio</label>
-                    <textarea name="bio" class="form-control" rows="3">{{ user.groomer_profile.bio }}</textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="profile_picture" class="form-label">Profile Picture</label>
-                    <input type="file" name="profile_picture" class="form-control" accept="image/*">
-                </div>
-                <div class="mb-3">
-                    <label for="location" class="form-label">Location</label>
-                    <input type="text" name="location" class="form-control" value="{{ user.groomer_profile.location }}">
-                </div>
-                <div class="mb-3">
-                    <label for="experience_years" class="form-label">Years of Experience</label>
-                    <input type="number" name="experience_years" class="form-control" value="{{ user.groomer_profile.experience_years }}">
-                </div>
-                <div class="mb-3">
-                    <label for="services_offered" class="form-label">Services Offered</label>
-                    <textarea name="services_offered" class="form-control" rows="3">{{ user.groomer_profile.services_offered }}</textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} text-center shadow-sm border-0">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             </div>
+        {% endif %}
+
+        <div class="card shadow p-4" style="border-radius: 15px;">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Display Current Profile Picture -->
+                <div class="mb-3 text-center">
+                    {% if user.groomer_profile.profile_picture and user.groomer_profile.profile_picture.name %}
+                        <img id="preview" src="{{ user.groomer_profile.profile_picture.url }}" 
+                             alt="Profile Picture" class="rounded-circle" width="150" height="150">
+                    {% else %}
+                        <img id="preview" src="{% static 'assets/default.webp' %}" 
+                             alt="Default Profile Picture" class="rounded-circle" width="150" height="150">
+                    {% endif %}
+                </div>
+
+                <!-- Form Fields using crispy -->
+                {{ form|crispy }}
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{% url 'groomer_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
+    </div>
 {% endblock %}

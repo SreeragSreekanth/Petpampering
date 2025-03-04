@@ -9,7 +9,12 @@ class GroomerProfileForm(forms.ModelForm):
     class Meta:
         model = GroomerProfile
         fields = ['bio', 'profile_picture', 'location', 'experience_years', 'services_offered']
-
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 3}),
+            'services_offered': forms.Textarea(attrs={'rows': 3}),
+            'experience_years': forms.NumberInput(),
+        }
+        
         def clean_experience_years(self):
             experience_years = self.cleaned_data.get('experience_years')
             if experience_years is not None and experience_years < 0:

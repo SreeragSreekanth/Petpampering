@@ -21,20 +21,26 @@ def groomer_dashboard(request):
     
     # Fetch services offered by the groomer
     services = Service.objects.filter(groomer=request.user)
-    
-    # Fetch unread notifications for the groomer
+
+    # Fetch unread notifications
     notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
-    
+
+    # Fetch appointment counts (replace with your actual model logic)
+    upcoming_appointments = Appointment.objects.filter(groomer=request.user, status='upcoming').count()
+    pending_appointments = Appointment.objects.filter(groomer=request.user, status='pending').count()
+
     # Mark notifications as read if requested
     if request.GET.get('mark_as_read'):
         notifications.update(is_read=True)
         return redirect('groomer_dashboard')  # Redirect to refresh the page
-    
+
     # Render the dashboard with profile, services, and notifications
     return render(request, 'groomer.html', {
         'profile': profile,
         'services': services,
         'notifications': notifications,
+        'upcoming_appointments': upcoming_appointments,
+        'pending_appointments': pending_appointments,
     })
 
 @role_required(['groomer','admin'])

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Groomer Dashboard{% endblock %}
 
@@ -9,21 +10,21 @@
     <!-- Profile Section -->
     <div class="card shadow-lg border-0 rounded-4 p-4 mb-5 text-center" style="max-width: 700px; margin: auto;">
         <div class="profile-picture-container mb-3">
-            {% if user.groomer_profile.profile_picture %}
-                <img src="{{ user.groomer_profile.profile_picture.url }}" class="profile-img img-fluid rounded-circle shadow-sm" 
+            {% if profile.profile_picture and profile.profile_picture.name %}
+                <img src="{{ profile.profile_picture.url }}" class="profile-img img-fluid rounded-circle shadow-sm" 
                     alt="Profile Picture" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #ddd;">
             {% else %}
-                <img src="https://via.placeholder.com/150" class="profile-img img-fluid rounded-circle shadow-sm" 
+                <img src="{% static 'assets/default.webp' %}"  class="profile-img img-fluid rounded-circle shadow-sm" 
                     alt="Profile Picture" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #ddd;">
             {% endif %}
         </div>
-        <h3 class="fw-bold mb-1">{{ user.username }}</h3>
-        <p class="text-muted">@{{ user.username|lower }}</p>
+        <h3 class="fw-bold mb-1">{{ request.user.username }}</h3>
+        <p class="text-muted">@{{ request.user.username|lower }}</p>
         <div class="text-start px-3">
-            <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
-            <p class="mb-1"><strong>Location:</strong> {{ user.groomer_profile.location|default:"Not Provided" }}</p>
-            <p class="mb-1"><strong>Experience:</strong> {{ user.groomer_profile.experience_years }} years</p>
-            <p class="mb-2"><strong>Bio:</strong> {{ user.groomer_profile.bio|default:"No bio available" }}</p>
+            <p class="mb-1"><strong>Email:</strong> {{ request.user.email }}</p>
+            <p class="mb-1"><strong>Location:</strong> {{ profile.location|default:"Not Provided" }}</p>
+            <p class="mb-1"><strong>Experience:</strong> {{ profile.experience_years }} years</p>
+            <p class="mb-2"><strong>Bio:</strong> {{ profile.bio|default:"No bio available" }}</p>
         </div>
         <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm mt-3">Edit Profile</a>
     </div>
@@ -40,8 +41,8 @@
                     <p class="fs-6 text-muted">View, edit, or add new services.</p>
                     <hr class="my-2">
                     <div class="d-flex justify-content-between">
-                        <span class="text-muted">Total Services: <strong>12</strong></span>
-                        <span class="text-muted">Active: <strong>9</strong></span>
+                        <span class="text-muted">Total Services: <strong>{{ services.count }}</strong></span>
+                        <span class="text-muted">Active: <strong>{{ services|length }}</strong></span>
                     </div>
                     <a href="{% url 'manage_services' %}" class="btn btn-secondary btn-sm mt-3 px-4">Manage Services</a>
                 </div>
@@ -58,13 +59,13 @@
                     <p class="fs-6 text-muted">Check upcoming appointments & manage requests.</p>
                     <hr class="my-2">
                     <div class="d-flex justify-content-between">
-                        <span class="text-muted">Upcoming: <strong>5</strong></span>
-                        <span class="text-muted">Pending: <strong>2</strong></span>
+                        <span class="text-muted">Pending: <strong>{{ pending_appointments|default:"0" }}</strong></span>
                     </div>
                     <a href="{% url 'manage_appointments' %}" class="btn btn-info btn-sm mt-3 px-4">Manage Appointments</a>
                 </div>
             </div>
         </div>
     </div> 
+
 </div>
 {% endblock %}

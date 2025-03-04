@@ -13,7 +13,7 @@ class PetOwnerProfileForm(forms.ModelForm):
     # Define a form for the PetOwnerProfile model
     class Meta:
         model = PetOwnerProfile
-        fields = ['phone_number', 'address', 'profile_picture']
+        fields = ['address', 'profile_picture']
 
 class PetForm(forms.ModelForm):
     class Meta:
