@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Admin Dashboard - PawPerfect{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -9,7 +9,7 @@
 
     <div class="row g-4 justify-content-center">
         <!-- User Management -->
-        <div class="col-md-5">
+        <div class="col-md-5 col-lg-3">
             <div class="card shadow-sm border-0 rounded-4 text-center p-3">
                 <div class="card-body">
                     <i class="fas fa-users fa-3x text-primary mb-3"></i>
@@ -21,7 +21,7 @@
         </div>
 
         <!-- Services Management -->
-        <div class="col-md-5">
+        <div class="col-md-5 col-lg-3">
             <div class="card shadow-sm border-0 rounded-4 text-center p-3">
                 <div class="card-body">
                     <i class="fas fa-cut fa-3x text-info mb-3"></i>
@@ -31,7 +31,30 @@
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- Pet Type Management -->
+        <div class="col-md-5 col-lg-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-paw fa-3x text-success mb-3"></i>
+                    <h5 class="card-title fw-semibold">Pet Type Management</h5>
+                    <p class="card-text text-muted">Add, edit, or remove pet types available on the platform.</p>
+                    <a href="{% url 'pet_type_list' %}" class="btn btn-success w-100">Manage Pet Types</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breed Management -->
+        <div class="col-md-5 col-lg-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-dog fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title fw-semibold">Breed Management</h5>
+                    <p class="card-text text-muted">Manage breeds associated with pet types.</p>
+                    <a href="{% url 'breed_list' %}" class="btn btn-warning w-100">Manage Breeds</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
