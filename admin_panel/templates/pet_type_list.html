@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Pet Types</h2>
+<a href="{% url 'pet_type_create' %}" class="btn btn-primary">Add Pet Type</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pet_type in pet_types %}
+        <tr>
+            <td>{{ pet_type.name }}</td>
+            <td>
+                <a href="{% url 'pet_type_update' pet_type.id %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'pet_type_delete' pet_type.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this pet type?');">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

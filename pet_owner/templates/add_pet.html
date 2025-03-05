@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -8,6 +9,8 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}  <!-- Using Crispy Forms -->
+
+            <script src="{% static 'pet_owner/js/pet_form.js' %}"></script>
             <button type="submit" class="btn btn-primary w-100">Add Pet</button>
         </form>
     </div>

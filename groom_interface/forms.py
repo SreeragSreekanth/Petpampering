@@ -24,7 +24,7 @@ class GroomerProfileForm(forms.ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['name', 'description', 'price', 'availability', 'image', 'pet_type']
+        fields = ['name', 'description', 'price', 'availability', 'image', 'pet_type','breed',]
 
         def clean_price(self):
             price = self.cleaned_data.get('price')

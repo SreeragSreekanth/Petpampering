@@ -1,59 +1,142 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %} Pet Owner Profile - {{ user.first_name }} {{ user.last_name }} {% endblock %}
+{% block title %}Pet Owner Profile - {{ owner.first_name }} {{ owner.last_name }} - PawPerfect{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4 text-center text-primary fw-bold">Pet Owner Profile</h2>
-    
-    <!-- Pet Owner Card -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body text-center">
-            <h4 class="card-title fw-bold">{{ user.first_name }} {{ user.last_name }}</h4>
-            <p class="card-text">
-                <i class="bi bi-person-circle text-secondary"></i> <strong>Username:</strong> {{ user.username }} <br>
-                <i class="bi bi-envelope text-secondary"></i> <strong>Email:</strong> {{ user.email }} <br>
-                <i class="bi bi-person-badge text-secondary"></i> <strong>Role:</strong> Pet Owner
-            </p>
+<div class="container py-5">
+    <!-- Profile Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-primary">Pet Owner Profile</h1>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="row g-0">
+                    <!-- Profile Picture -->
+                    <div class="col-md-4 d-flex align-items-center justify-content-center p-4">
+                        {% if owner.pet_owner_profile.profile_picture and owner.pet_owner_profile.profile_picture.name %}
+                            <img src="{{ owner.pet_owner_profile.profile_picture.url }}" 
+                                 class="img-fluid rounded-circle" 
+                                 alt="{{ owner.first_name }}'s Profile Picture" 
+                                 style="width: 200px; height: 200px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'assets/default.webp' %}" 
+                                 class="img-fluid rounded-circle" 
+                                 alt="Default Profile Picture" 
+                                 style="width: 200px; height: 200px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <!-- Profile Details -->
+                    <div class="col-md-8">
+                        <div class="card-body py-4">
+                            <h3 class="card-title fw-bold mb-3">{{ owner.first_name }} {{ owner.last_name }}</h3>
+                            <ul class="list-unstyled text-muted">
+                                <li class="mb-2">
+                                    <i class="bi bi-person-circle me-2 text-secondary"></i>
+                                    <strong>Username:</strong> {{ owner.username }}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-envelope me-2 text-secondary"></i>
+                                    <strong>Email:</strong> {{ owner.email }}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-geo-alt me-2 text-secondary"></i>
+                                    <strong>Address:</strong> {{ owner.pet_owner_profile.address|default:"Not provided" }}
+                                </li>
+                                <li>
+                                    <i class="bi bi-person-badge me-2 text-secondary"></i>
+                                    <strong>Role:</strong> Pet Owner
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Pets Section -->
-    <h3 class="mt-5 text-center text-success fw-bold">Pets</h3>
-    <div class="row justify-content-center">
-        {% for pet in pets %}
-        <div class="col-md-4 col-sm-6 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-img-top text-center">
-                    {% if pet.pet_picture %}
-                        <img src="{{ pet.pet_picture.url }}" class="img-fluid rounded" style="height: 250px; width: 100%; object-fit: cover;" alt="{{ pet.name }}">
-                    {% else %}
-                        <img src="{% static 'assets/default.webp' %}" class="img-fluid rounded" style="height: 250px; width: 100%; object-fit: cover;" alt="Default Pet Image">
-                    {% endif %}
-                </div>
-
-                <div class="card-body text-center">
-                    <h5 class="card-title fw-bold">{{ pet.name }}</h5>
-                    <p class="card-text text-muted">
-                        <i class="bi bi-patch-question text-secondary"></i> <strong>Breed:</strong> {{ pet.breed }}<br>
-                        <i class="bi bi-calendar text-secondary"></i> <strong>Age:</strong> {{ pet.age }} years<br>
-                        <i class="bi bi-box text-secondary"></i> <strong>Weight:</strong> {{ pet.weight }} kg<br>
-                        <i class="bi bi-gender-ambiguous text-secondary"></i> <strong>Gender:</strong> {{ pet.gender }}
-                    </p>
-                </div>
+    <div class="mt-5">
+        <h2 class="text-center fw-bold text-success mb-4">My Pets</h2>
+        {% if pets %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+                {% for pet in pets %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0 rounded-3">
+                            {% if pet.pet_picture %}
+                                <img src="{{ pet.pet_picture.url }}" 
+                                     class="card-img-top rounded-top" 
+                                     alt="{{ pet.name }}'s Picture" 
+                                     style="height: 250px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'assets/default.webp' %}" 
+                                     class="card-img-top rounded-top" 
+                                     alt="Default Pet Image" 
+                                     style="height: 250px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body text-center">
+                                <h5 class="card-title fw-bold text-dark">{{ pet.name }}</h5>
+                                <ul class="list-unstyled text-muted">
+                                    <li>
+                                        <i class="bi bi-patch-question me-2 text-secondary"></i>
+                                        <strong>Type:</strong> {{ pet.pet_type.name }}
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-patch-question me-2 text-secondary"></i>
+                                        <strong>Breed:</strong> {{ pet.breed.name|default:"Unknown" }}
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-calendar me-2 text-secondary"></i>
+                                        <strong>Age:</strong> {{ pet.age }} year{{ pet.age }}
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-box me-2 text-secondary"></i>
+                                        <strong>Weight:</strong> {{ pet.weight }} kg
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-gender-ambiguous me-2 text-secondary"></i>
+                                        <strong>Gender:</strong> {{ pet.gender }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        </div>
-        {% empty %}
-            <p class="text-muted text-center">No pets found for this user.</p>
-        {% endfor %}
+        {% else %}
+            <div class="text-center text-muted">
+                <p>No pets found for this owner.</p>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Back Button -->
-    <div class="text-center mt-4">
-        <a href="{% url 'manage_users' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Users
-        </a>
-    </div>
+    <!-- Back Button for Admins -->
+    {% if request.user.is_staff %}
+        <div class="text-center mt-5">
+            <a href="{% url 'manage_users' %}" class="btn btn-outline-secondary px-4 py-2">
+                <i class="bi bi-arrow-left me-2"></i>Back to Users
+            </a>
+        </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .profile-img {
+            transition: transform 0.3s ease;
+        }
+        .profile-img:hover {
+            transform: scale(1.05);
+        }
+        .card {
+            transition: box-shadow 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+        }
+    </style>
 {% endblock %}

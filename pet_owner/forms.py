@@ -20,6 +20,20 @@ class PetForm(forms.ModelForm):
         model = Pet
         fields = ['name', 'pet_type','breed', 'age', 'weight', 'gender', 'grooming_preferences', 'health_information', 'pet_picture']
 
+    def __init__(self, *args, **kwargs):
+        super(PetForm, self).__init__(*args, **kwargs)
+        self.fields['breed'].queryset = PetBreed.objects.none()  # Initially empty
+
+        if 'pet_type' in self.data:
+            try:
+                pet_type_id = int(self.data.get('pet_type'))
+                self.fields['breed'].queryset = PetBreed.objects.filter(pet_type_id=pet_type_id).order_by('name')
+            except (ValueError, TypeError):
+                pass  # Invalid input, just leave queryset empty
+
+        elif self.instance.pk:
+            self.fields['breed'].queryset = self.instance.pet_type.breeds.order_by('name')
+            
         
 
 class AppointmentForm(forms.ModelForm):

@@ -427,11 +427,12 @@ def delete_reply(request, reply_id):
 
 
 @login_required
+@role_required(['pet_owner','admin'])
 def view_pet_owner(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-
+    owner = get_object_or_404(User, id=user_id)
+    owner_profile = get_object_or_404(PetOwnerProfile, user=owner)
 
     # Fetch pets owned by this pet owner
-    pets = Pet.objects.filter(owner=user)
+    pets = Pet.objects.filter(owner=owner)
 
-    return render(request, 'view_pet_owner.html', {'user': user, 'pets': pets})
+    return render(request, 'view_pet_owner.html', {'owner': owner, 'pets': pets,'ownerprofile':owner_profile})

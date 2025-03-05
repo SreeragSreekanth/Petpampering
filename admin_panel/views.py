@@ -7,6 +7,8 @@ from groom_interface.models import *
 from groom_interface.forms import *
 from django.contrib import messages
 from userauth.decorators import  superuser_required
+from pet_owner.models import PetType,PetBreed
+from .forms import PetTypeForm,BreedForm
 
 
 @login_required
@@ -96,3 +98,70 @@ def delete_service(request, service_id):
 
 
 
+def pet_type_list(request):
+    pet_types = PetType.objects.all()
+    return render(request, "pet_type_list.html", {"pet_types": pet_types})
+
+def pet_type_create(request):
+    if request.method == "POST":
+        form = PetTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pet Type added successfully!")
+            return redirect("pet_type_list")
+    else:
+        form = PetTypeForm()
+    return render(request, "pet_type_form.html", {"form": form})
+
+def pet_type_update(request, pk):
+    pet_type = get_object_or_404(PetType, pk=pk)
+    if request.method == "POST":
+        form = PetTypeForm(request.POST, instance=pet_type)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pet Type updated successfully!")
+            return redirect("pet_type_list")
+    else:
+        form = PetTypeForm(instance=pet_type)
+    return render(request, "pet_type_form.html", {"form": form})
+
+def pet_type_delete(request, pk):
+    pet_type = get_object_or_404(PetType, pk=pk)
+    pet_type.delete()
+    messages.success(request, "Pet Type deleted successfully!")
+    return redirect("pet_type_list")
+
+# ---------- BREED CRUD -----------
+def breed_list(request):
+    breeds = PetBreed.objects.select_related("pet_type").all()
+    return render(request, "breed_list.html", {"breeds": breeds})
+
+def breed_create(request):
+    if request.method == "POST":
+        form = BreedForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Breed added successfully!")
+            return redirect("breed_list")
+    else:
+        form = BreedForm()
+    return render(request, "add_breed.html", {"form": form})
+
+def breed_update(request, pk):
+    breed = get_object_or_404(PetBreed, pk=pk)
+    if request.method == "POST":
+        form = BreedForm(request.POST, instance=breed)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Breed updated successfully!")
+            return redirect("breed_list")
+    else:
+        form = BreedForm(instance=breed)
+    return render(request, "add_breed.html", {"form": form})
+
+def breed_delete(request, pk):
+    breed = get_object_or_404(PetBreed, pk=pk)
+    breed.delete()
+    messages.success(request, "Breed deleted successfully!")
+    return redirect("breed_list")
+        

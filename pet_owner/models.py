@@ -7,7 +7,6 @@ from django.apps import apps  # Import apps module
 
 class PetOwnerProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pet_owner_profile')
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
@@ -15,24 +14,34 @@ class PetOwnerProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
 
+class PetType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class PetBreed(models.Model):
+    pet_type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name='breeds')
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name} ({self.pet_type.name})"
+
 class Pet(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pets')
     name = models.CharField(max_length=100)
-    pet_type = models.CharField(max_length=100, help_text="E.g., Dog, Cat, Rabbit, Bird")  # New field for pet type
-    breed = models.CharField(max_length=100, blank=True, null=True)
-    age = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(30)])
-    weight = models.DecimalField(max_digits=5, decimal_places=2,validators=[MinValueValidator(0, message="Weight cannot be less than 0.")], help_text="Weight in kg")
-    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')])
+    pet_type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name="pets")
+    breed = models.ForeignKey(PetBreed, on_delete=models.CASCADE, related_name="pets", blank=True, null=True)
+    age = models.PositiveIntegerField()
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
     grooming_preferences = models.TextField(blank=True, null=True)
     health_information = models.TextField(blank=True, null=True)
     pet_picture = models.ImageField(upload_to='pet_pics/', blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        self.pet_type = self.pet_type.strip().lower()  # Ensure lowercase and strip any spaces
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"{self.name} ({self.pet_type} - {self.breed})"
+        return f"{self.name} ({self.pet_type.name} - {self.breed.name if self.breed else 'No Breed'})"
+
     
     
 class PetOwnerProfile(models.Model):

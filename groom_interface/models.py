@@ -2,7 +2,7 @@ from django.db import models
 from userauth.models import User
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from pet_owner.models import Feedback
+from pet_owner.models import Feedback,PetType,PetBreed
 
 
 # Create your models here.
@@ -17,11 +17,11 @@ class Service(models.Model):
     )
     availability = models.BooleanField(default=True)
     image = models.ImageField(upload_to='services/', blank=True, null=True)
-    pet_type = models.CharField(max_length=100, help_text="E.g., Dog, Cat, Rabbit, Bird")  # Updated field
+    pet_type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name='services')  # Updated
+    breed = models.ForeignKey(PetBreed, on_delete=models.CASCADE, related_name='services', blank=True, null=True)  # Updated    def __str__(self):
 
     def __str__(self):
-        return f"{self.name} - {self.pet_type} - {self.groomer.username}"
-
+        return f"{self.name} - {self.pet_type.name} - {self.breed.name if self.breed else 'Any Breed'} - {self.groomer.username}"
 
 
 class GroomerProfile(models.Model):
@@ -33,6 +33,7 @@ class GroomerProfile(models.Model):
         validators=[MinValueValidator(0, message="Experience years cannot be less than 0.")]
     )
     services_offered = models.TextField(blank=True, null=True)
+
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
