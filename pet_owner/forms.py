@@ -18,22 +18,27 @@ class PetOwnerProfileForm(forms.ModelForm):
 class PetForm(forms.ModelForm):
     class Meta:
         model = Pet
-        fields = ['name', 'pet_type','breed', 'age', 'weight', 'gender', 'grooming_preferences', 'health_information', 'pet_picture']
+        fields = [
+            'name', 'pet_type', 'breed', 'age', 'weight', 
+            'gender', 'grooming_preferences', 'health_information', 'pet_picture'
+        ]
 
     def __init__(self, *args, **kwargs):
-        super(PetForm, self).__init__(*args, **kwargs)
-        self.fields['breed'].queryset = PetBreed.objects.none()  # Initially empty
+        super().__init__(*args, **kwargs)
 
-        if 'pet_type' in self.data:
-            try:
-                pet_type_id = int(self.data.get('pet_type'))
-                self.fields['breed'].queryset = PetBreed.objects.filter(pet_type_id=pet_type_id).order_by('name')
-            except (ValueError, TypeError):
-                pass  # Invalid input, just leave queryset empty
+        # Initially, show all breeds but let JavaScript handle filtering
+        self.fields['breed'].queryset = PetBreed.objects.all()
 
-        elif self.instance.pk:
-            self.fields['breed'].queryset = self.instance.pet_type.breeds.order_by('name')
-            
+    def clean(self):
+        cleaned_data = super().clean()
+        pet_type = cleaned_data.get("pet_type")
+        breed = cleaned_data.get("breed")
+
+        # Ensure the breed belongs to the selected pet type
+        if breed and breed.pet_type != pet_type:
+            raise forms.ValidationError("Selected breed does not belong to the chosen pet type.")
+
+        return cleaned_data
         
 
 class AppointmentForm(forms.ModelForm):

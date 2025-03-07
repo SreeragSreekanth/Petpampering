@@ -1,7 +1,7 @@
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import PetOwnerProfile, Pet, CommunityPost, Feedback
+from .models import PetOwnerProfile, Pet, CommunityPost, Feedback,PetBreed,PetType
 from .forms import PetOwnerProfileForm, PetForm, AppointmentForm, RescheduleAppointmentForm, CommunityPostForm,ReplyForm, FeedbackForm
 from groom_interface.models import Appointment, Service
 from django.contrib import messages
@@ -16,9 +16,15 @@ from django.http import HttpResponseForbidden
 from .models import Reply
 from django.db.models.functions import Lower
 from userauth.models import User
+from django.http import JsonResponse
 
 
 
+
+def get_breeds(request):
+    pet_type_id = request.GET.get('pet_type_id')
+    breeds = PetBreed.objects.filter(pet_type_id=pet_type_id).values('id', 'name')
+    return JsonResponse(list(breeds), safe=False)
 
 @login_required
 @role_required(['owner'])
@@ -34,31 +40,29 @@ def profile_management(request):
     return render(request, 'profile_management.html', {'form': form})
 
 @login_required
-@role_required(['owner'])
 def add_pet(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PetForm(request.POST, request.FILES)
         if form.is_valid():
             pet = form.save(commit=False)
-            pet.owner = request.user
+            pet.owner = request.user  # Assign the current user as the pet owner
             pet.save()
-            return redirect('pet_list')
+            return redirect('pet_list')  # Redirect to pet list or details page
     else:
         form = PetForm()
     return render(request, 'add_pet.html', {'form': form})
 
 @login_required
-@role_required(['owner'])
 def edit_pet(request, pet_id):
-    pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
-    if request.method == 'POST':
+    pet = get_object_or_404(Pet, id=pet_id, owner=request.user)  # Ensure the user owns the pet
+    if request.method == "POST":
         form = PetForm(request.POST, request.FILES, instance=pet)
         if form.is_valid():
             form.save()
-            return redirect('pet_list')
+            return redirect('pet_list')  # Redirect to pet details page
     else:
         form = PetForm(instance=pet)
-    return render(request, 'edit_pet.html', {'form': form})
+    return render(request, 'edit_pet.html', {'form': form, 'pet': pet})
 
 @login_required
 @role_required(['owner'])
@@ -436,3 +440,4 @@ def view_pet_owner(request, user_id):
     pets = Pet.objects.filter(owner=owner)
 
     return render(request, 'view_pet_owner.html', {'owner': owner, 'pets': pets,'ownerprofile':owner_profile})
+

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
+
 
 {% block title %}Pet Grooming{% endblock %}
 {% block content %}
@@ -29,4 +31,7 @@
         </div>
     </div>
 </div>
+
+<script src="{% static 'pet_owner/js/dynamic_breeds.js' %}"></script>
+
 {% endblock %}

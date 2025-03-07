@@ -11,7 +11,7 @@
             <div class="card shadow-sm h-100">  <!-- Ensures uniform card height -->
                 <div style="height: 200px; overflow: hidden;">
                     {% if pet.pet_picture %}
-                        <img src="{{ pet.pet_picture.url }}" class="card-img-top" alt="{{ pet.name }}" style="height: 100%; width: 100%; object-fit: cover;">
+                        <img src="{{ pet.pet_picture.url }}" class="card-img-top" alt="{{ pet.name }}" style="height: 100%; width: 100%; object-fit: contain;">
                     {% else %}
                         <img src="{% static 'assets/default.webp' %}" class="card-img-top" alt="Default Pet Image" style="height: 100%; width: 100%; object-fit: cover;">
                     {% endif %}

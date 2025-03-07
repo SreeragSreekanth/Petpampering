@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="container py-5">
+
     <!-- Profile Header -->
     <div class="text-center mb-5">
         <h1 class="display-5 fw-bold text-primary">Pet Owner Profile</h1>
@@ -15,6 +16,7 @@
         <div class="col-lg-8 col-md-10">
             <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
                 <div class="row g-0">
+
                     <!-- Profile Picture -->
                     <div class="col-md-4 d-flex align-items-center justify-content-center p-4">
                         {% if owner.pet_owner_profile.profile_picture and owner.pet_owner_profile.profile_picture.name %}
@@ -29,6 +31,7 @@
                                  style="width: 200px; height: 200px; object-fit: cover;">
                         {% endif %}
                     </div>
+
                     <!-- Profile Details -->
                     <div class="col-md-8">
                         <div class="card-body py-4">
@@ -53,55 +56,63 @@
                             </ul>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Pets Section -->
+   <!-- Pets Section -->
     <div class="mt-5">
         <h2 class="text-center fw-bold text-success mb-4">My Pets</h2>
+
         {% if pets %}
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
                 {% for pet in pets %}
                     <div class="col">
                         <div class="card h-100 shadow-sm border-0 rounded-3">
+                            
+                            <!-- Pet Picture -->
                             {% if pet.pet_picture %}
                                 <img src="{{ pet.pet_picture.url }}" 
-                                     class="card-img-top rounded-top" 
-                                     alt="{{ pet.name }}'s Picture" 
-                                     style="height: 250px; object-fit: cover;">
+                                    class="card-img-top rounded-top" 
+                                    alt="{{ pet.name }}'s Picture" 
+                                    style="height: 250px; object-fit: contain;">
                             {% else %}
                                 <img src="{% static 'assets/default.webp' %}" 
-                                     class="card-img-top rounded-top" 
-                                     alt="Default Pet Image" 
-                                     style="height: 250px; object-fit: cover;">
+                                    class="card-img-top rounded-top" 
+                                    alt="Default Pet Image" 
+                                    style="height: 250px; object-fit: cover;">
                             {% endif %}
-                            <div class="card-body text-center">
-                                <h5 class="card-title fw-bold text-dark">{{ pet.name }}</h5>
-                                <ul class="list-unstyled text-muted">
-                                    <li>
-                                        <i class="bi bi-patch-question me-2 text-secondary"></i>
-                                        <strong>Type:</strong> {{ pet.pet_type.name }}
-                                    </li>
-                                    <li>
-                                        <i class="bi bi-patch-question me-2 text-secondary"></i>
-                                        <strong>Breed:</strong> {{ pet.breed.name|default:"Unknown" }}
-                                    </li>
-                                    <li>
-                                        <i class="bi bi-calendar me-2 text-secondary"></i>
-                                        <strong>Age:</strong> {{ pet.age }} year{{ pet.age }}
-                                    </li>
-                                    <li>
-                                        <i class="bi bi-box me-2 text-secondary"></i>
-                                        <strong>Weight:</strong> {{ pet.weight }} kg
-                                    </li>
-                                    <li>
-                                        <i class="bi bi-gender-ambiguous me-2 text-secondary"></i>
-                                        <strong>Gender:</strong> {{ pet.gender }}
-                                    </li>
-                                </ul>
+
+                            <!-- Pet Details -->
+                            <div class="card-body">
+                                <h4 class="card-title fw-bold text-dark text-center">{{ pet.name }}</h4>
+                                
+                                <div class="px-3 py-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span><i class="bi bi-patch-question text-secondary"></i> <strong>Type:</strong></span>
+                                        <span>{{ pet.pet_type.name }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span><i class="bi bi-patch-question text-secondary"></i> <strong>Breed:</strong></span>
+                                        <span>{{ pet.breed.name|default:"Unknown" }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span><i class="bi bi-calendar text-secondary"></i> <strong>Age:</strong></span>
+                                        <span>{{ pet.age }} year{{ pet.age|pluralize }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span><i class="bi bi-box text-secondary"></i> <strong>Weight:</strong></span>
+                                        <span>{{ pet.weight }} kg</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <span><i class="bi bi-gender-ambiguous text-secondary"></i> <strong>Gender:</strong></span>
+                                        <span>{{ pet.gender }}</span>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 {% endfor %}
@@ -113,6 +124,7 @@
         {% endif %}
     </div>
 
+
     <!-- Back Button for Admins -->
     {% if request.user.is_staff %}
         <div class="text-center mt-5">
@@ -121,5 +133,6 @@
             </a>
         </div>
     {% endif %}
+
 </div>
 {% endblock %}
