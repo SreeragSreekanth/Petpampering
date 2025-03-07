@@ -11,6 +11,7 @@ urlpatterns = [
     path('myservices/view/<int:service_id>/', views.view_service, name='view_service'),
     path('manageappointments/', views.manage_appointments, name='manage_appointments'),
     path('manageappointments/update/<int:appointment_id>/<str:status>/', views.update_appointment_status, name='update_appointment'),
+    path('services/<int:service_id>/appointments/', views.service_appointments, name='service_appointments'),
     path('groomer/<int:groomer_id>/', views.groomer_profile, name='groomer_profile'),
     path('feedback/respond/<int:feedback_id>/', views.respond_to_feedback, name='respond_to_feedback'),
     path('respond_to_feedback/<int:feedback_id>/', views.respond_to_feedback, name='respond_to_feedback'),

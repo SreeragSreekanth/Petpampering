@@ -8,7 +8,9 @@
     <div class="container">
         <h1 class="display-3">Welcome to PawPerfect</h1>
         <p class="lead">Your one-stop solution for all your pet grooming needs</p>
-        <a href="{% url 'signup' %}" class="btn btn-light btn-lg mt-3">Get Started</a>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'signup' %}" class="btn btn-light btn-lg mt-3">Get Started</a>
+        {% endif %}
     </div>
 </section>
 
@@ -58,7 +60,9 @@
     <div class="container">
         <h2>Ready to make your pet look fabulous?</h2>
         <p class="lead">Sign up today and book your first grooming appointment!</p>
-        <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Join Now</a>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Join Now</a>
+        {% endif %}
     </div>
 </section>
 

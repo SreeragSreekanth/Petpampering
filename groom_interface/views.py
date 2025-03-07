@@ -21,7 +21,7 @@ def groomer_dashboard(request):
     
     # Fetch services offered by the groomer
     services = Service.objects.filter(groomer=request.user)
-
+    active_services = Service.objects.filter(groomer=request.user,availability=True)
     # Fetch unread notifications
     notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
 
@@ -38,6 +38,7 @@ def groomer_dashboard(request):
     return render(request, 'groomer.html', {
         'profile': profile,
         'services': services,
+        'active_services': active_services,
         'notifications': notifications,
         'upcoming_appointments': upcoming_appointments,
         'pending_appointments': pending_appointments,
@@ -211,3 +212,14 @@ def respond_to_feedback(request, feedback_id):
     else:
         form = ResponseForm()  # Ensure form is passed even for GET requests
     return render(request, "respond_to_feedback.html", {"form": form, "feedback": feedback})
+
+@login_required
+@role_required(['groomer'])
+def service_appointments(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    appointments = Appointment.objects.filter(service=service)
+
+    return render(request, 'service_appointments.html', {
+        'service': service,
+        'appointments': appointments
+    })

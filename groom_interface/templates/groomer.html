@@ -42,7 +42,7 @@
                     <hr class="my-2">
                     <div class="d-flex justify-content-between">
                         <span class="text-muted">Total Services: <strong>{{ services.count }}</strong></span>
-                        <span class="text-muted">Active: <strong>{{ services|length }}</strong></span>
+                        <span class="text-muted">Active: <strong>{{ active_services.count }}</strong></span>
                     </div>
                     <a href="{% url 'manage_services' %}" class="btn btn-secondary btn-sm mt-3 px-4">Manage Services</a>
                 </div>
