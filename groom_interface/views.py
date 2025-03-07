@@ -43,7 +43,7 @@ def groomer_dashboard(request):
         'pending_appointments': pending_appointments,
     })
 
-@role_required(['groomer','admin'])
+@role_required(['owner','groomer','admin'])
 def groomer_profile(request, groomer_id):
     groomer = get_object_or_404(User, id=groomer_id, role='groomer')  
     groomer_profile = get_object_or_404(GroomerProfile, user=groomer)  # Fetch Groomer's profile
@@ -130,12 +130,19 @@ def delete_service(request, service_id):
 def view_service(request, service_id):
     service = get_object_or_404(Service, id=service_id)
     
+    has_accepted_appointment = Appointment.objects.filter(
+        pet_owner=request.user,
+        service=service,
+        status='accepted'  # Only check for 'accepted' appointments
+    ).exists()
+
     # Check if the user has already left feedback for this service
     has_left_feedback = Feedback.objects.filter(service=service, pet_owner=request.user).exists()
 
     return render(request, 'view_service.html', {
         'service': service,
         'has_left_feedback': has_left_feedback,
+        'has_accepted_appointment': has_accepted_appointment,
     })
 
 
@@ -151,11 +158,20 @@ def manage_appointments(request):
 @role_required(['groomer'])
 def update_appointment_status(request, appointment_id, status):
     appointment = get_object_or_404(Appointment, id=appointment_id, groomer=request.user)
-    if status in ["accepted", "declined"]:
+    if status in ["accepted", "declined","completed"]:
         appointment.status = status
         appointment.save()
         messages.success(request, f"Appointment has been {status}.")
         # Send notifications
+
+        if appointment.status == "completed":
+            # ✅ Create an Invoice for this appointment
+            Invoice.objects.create(
+                appointment=appointment,
+                total_amount=appointment.service.price,
+                status='pending'
+            )
+
         send_notification(
             user=appointment.pet_owner,
             message=f"Your appointment for {appointment.service.name} has been {status}."

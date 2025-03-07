@@ -76,18 +76,20 @@
                             </div>
                         </div>
                     {% empty %}
-                        <p class="text-muted text-center">No feedback yet. Be the first to leave a review!</p>
+                        <p class="text-muted text-center">No feedback yet.</p>
                     {% endfor %}
                 </div>
 
                 <!-- Leave Feedback Button -->
                 {% if user.is_authenticated and user != service.groomer and not user.is_superuser %}
-                    {% if not has_left_feedback %}
-                        <div class="text-center mt-3">
-                            <a href="{% url 'leave_feedback' service.id %}" class="btn btn-primary">Leave Feedback</a>
-                        </div>
-                    {% else %}
-                        <p class="text-muted text-center">You have already left feedback for this service.</p>
+                    {% if has_accepted_appointment %}
+                        {% if not has_left_feedback %}
+                            <div class="text-center mt-3">
+                                <a href="{% url 'leave_feedback' service.id %}" class="btn btn-primary">Leave Feedback</a>
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center">You have already left feedback for this service.</p>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             </div>

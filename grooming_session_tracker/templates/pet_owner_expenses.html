@@ -1,39 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
   <h1 class="text-center mb-4">Your Expenses and Billing</h1>
+  
   {% if appointment_details %}
     <div class="row">
       {% for detail in appointment_details %}
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Appointment for {{ detail.appointment.service.name }}</h5>
-              <p class="card-text"><strong>Date & Time:</strong> {{ detail.appointment.date_time }}</p>
-              <p class="card-text"><strong>Total Amount:</strong> ${{ detail.invoice.total_amount }}</p>
-              <p class="card-text"><strong>Status:</strong> 
+        {% if detail.appointment.status == 'completed' %}
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Appointment for {{ detail.appointment.service.name }}</h5>
+                <p class="card-text"><strong>Date & Time:</strong> {{ detail.appointment.date_time }}</p>
+                <p class="card-text"><strong>Total Amount:</strong> ${{ detail.invoice.total_amount }}</p>
+                <p class="card-text"><strong>Status:</strong> 
+                  {% if detail.invoice.status == 'paid' %}
+                    <span class="badge bg-success">{{ detail.invoice.status|title }}</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">{{ detail.invoice.status|title }}</span>
+                  {% endif %}
+                </p>
+                <p class="card-text"><strong>Invoice Created:</strong> {{ detail.invoice.created_at }}</p>
+
                 {% if detail.invoice.status == 'paid' %}
-                  <span class="badge bg-success">{{ detail.invoice.status|title }}</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark">{{ detail.invoice.status|title }}</span>
-                {% endif %}
-              </p>
-              <p class="card-text"><strong>Invoice Created:</strong> {{ detail.invoice.created_at }}</p>
-              
-
-              {% if detail.invoice.status == 'paid' %}
                   <a href="{% url 'view_invoice_pdf' detail.invoice.id %}" target="_blank" class="btn btn-primary">View Invoice PDF</a>
-              {% endif %}
-
-              <!-- 🔹 Generate Invoice Button - Only if Status is Paid -->
-              {% if detail.invoice.status == 'paid' %}
-                <a href="{% url 'generate_invoice_pdf' detail.invoice.id %}" class="btn btn-primary btn-sm mt-2">
-                  <i class="bi bi-file-earmark-pdf"></i> Generate Invoice
-                </a>
-              {% endif %}
-              
+                  <a href="{% url 'generate_invoice_pdf' detail.invoice.id %}" class="btn btn-primary btn-sm mt-2">
+                    <i class="bi bi-file-earmark-pdf"></i> Generate Invoice
+                  </a>
+                {% endif %}
+              </div>
             </div>
           </div>
-        </div>
+        {% endif %}
       {% endfor %}
     </div>
   {% else %}
@@ -41,6 +38,7 @@
       You don't have any expenses recorded yet.
     </div>
   {% endif %}
+
   <!-- Pagination Controls -->
   <div class="d-flex justify-content-center mt-4">
     <ul class="pagination">

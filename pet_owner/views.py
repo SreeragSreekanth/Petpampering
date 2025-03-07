@@ -40,6 +40,7 @@ def profile_management(request):
     return render(request, 'profile_management.html', {'form': form})
 
 @login_required
+@role_required(['owner'])
 def add_pet(request):
     if request.method == "POST":
         form = PetForm(request.POST, request.FILES)
@@ -53,6 +54,7 @@ def add_pet(request):
     return render(request, 'add_pet.html', {'form': form})
 
 @login_required
+@role_required(['owner'])
 def edit_pet(request, pet_id):
     pet = get_object_or_404(Pet, id=pet_id, owner=request.user)  # Ensure the user owns the pet
     if request.method == "POST":
@@ -96,106 +98,87 @@ def dashboard(request):
 def browse_services(request):
     query = request.GET.get('q', '')  # Get search query from URL
     services = Service.objects.filter(availability=True)
-    
+
     if query:
-        # Combine multiple search conditions with Q objects
         services = services.filter(
             Q(name__icontains=query) | 
-            Q(pet_type__icontains=query) | 
-            Q(description__icontains=query) |  # Search within the description field as well
+            Q(pet_type__name__icontains=query) |  # ✅ Correct: Filter by pet type name
+            Q(description__icontains=query) |  
             Q(groomer__username__icontains=query)
         )
-    
+
     # AI Recommendation Logic
     recommended_services = []
     if request.user.is_authenticated:
-        pets = Pet.objects.filter(owner=request.user)  # Get user's pets
+        pets = Pet.objects.filter(owner=request.user)  
         if pets.exists():
-            pet_types = [pet.pet_type.lower() for pet in pets]
-            pet_weights = [float(pet.weight) for pet in pets]
-            pet_ages = [pet.age for pet in pets]
+            pet_types = list(PetType.objects.filter(id__in=pets.values_list('pet_type', flat=True)).values_list('name', flat=True))
+
             grooming_prefs = [pet.grooming_preferences.lower() for pet in pets if pet.grooming_preferences]
-            
-            # Filter services based on pet types (case-insensitive)
-            filtered_services = Service.objects.annotate(
-                lower_pet_type=Lower('pet_type')
+
+            # ✅ Correct way to filter services
+            filtered_services = Service.objects.filter(
+                availability=True
             ).filter(
-                availability=True,
-                lower_pet_type__in=pet_types
+                Q(pet_type__name__in=pet_types) # ✅ Matching by name instead of ID
             )
-            
-            # Debugging: Print available services and their pet_type
-            available_services = Service.objects.filter(availability=True)
-            print("Available Services:")
-            for service in available_services:
-                print(f"Service: {service.name}, Pet Type: {service.pet_type}")
-            
-            # If no services match the pet types, fallback to common pet types
-            if not filtered_services.exists():
-                print("No services found for pet types:", pet_types)
-                filtered_services = Service.objects.filter(availability=True, pet_type__in=['dog', 'cat'])
-            
-            # AI-based filtering
+
+            # AI-based filtering (ignoring age & weight)
             service_features = []
             service_map = {}
             for index, service in enumerate(filtered_services):
-                pet_type_match = 1 if service.pet_type.lower() in pet_types else 0
-                avg_weight = np.mean(pet_weights) if pet_weights else 0
-                avg_age = np.mean(pet_ages) if pet_ages else 0
+                pet_type_match = 1 if service.pet_type.name in pet_types else 0
                 grooming_pref_match = 1 if any(pref in service.description.lower() for pref in grooming_prefs) else 0
                 
-                feature_vector = [pet_type_match, avg_weight, avg_age, grooming_pref_match]
+                feature_vector = [pet_type_match, grooming_pref_match]
                 service_features.append(feature_vector)
                 service_map[index] = service
             
             if service_features:
                 similarity_matrix = cosine_similarity([service_features[0]], service_features)
-                recommended_indices = np.argsort(similarity_matrix[0])[::-1]  # Sort by similarity score
-                recommended_services = [service_map[i] for i in recommended_indices[:5]]  # Top 5 recommendations
-            
-            print("Recommended Services:", recommended_services)
-    
+                recommended_indices = np.argsort(similarity_matrix[0])[::-1]  
+                recommended_services = [service_map[i] for i in recommended_indices[:5]]  
+
     return render(request, "browse_services.html", {
         "services": services,
         "recommended_services": recommended_services,
         "query": query,
     })
 
+
 @login_required
 @role_required(['owner'])
 def book_appointment(request, service_id):
     service = get_object_or_404(Service, id=service_id)
-    pet = Pet.objects.filter(owner=request.user).first()
-    if not pet:
-        return redirect('error_page')
+    print("Selected Service:", service)
+    print("Service Pet Type:", service.pet_type)
+
+    pets = Pet.objects.filter(owner=request.user, pet_type=service.pet_type)
+    print("Filtered Pets for User:", pets)  # Debugging
 
     if request.method == 'POST':
-        form = AppointmentForm(request.POST, user=request.user)
+        form = AppointmentForm(request.POST, user=request.user, service=service)  # ✅ Pass service
         if form.is_valid():
             appointment = form.save(commit=False)
             appointment.groomer = service.groomer
             appointment.pet_owner = request.user
             appointment.service = service
-            appointment.pet = pet
+            appointment.pet = form.cleaned_data['pet']  # ✅ Fix: Get pet from form
             appointment.save()
 
-            # ✅ Create an Invoice for this appointment
-            Invoice.objects.create(
-                appointment=appointment,
-                total_amount=service.price,  # Use 'total_amount' if your model has it
-                status='pending'
-            )
-
+            
 
             # Send notifications
             send_notification(user=appointment.groomer, message=f"A new appointment has been booked.")
             send_notification(user=appointment.pet_owner, message=f"Your appointment has been booked.")
 
             return redirect('view_appointments')
-
     else:
-        form = AppointmentForm(user=request.user)
+        form = AppointmentForm(user=request.user, service=service)  # ✅ Pass service
+
     return render(request, 'book_appointment.html', {'form': form, 'service': service})
+
+
 
 @login_required
 @role_required(['owner'])

@@ -42,7 +42,11 @@ class PetForm(forms.ModelForm):
         
 
 class AppointmentForm(forms.ModelForm):
-    pet = forms.ModelChoiceField(queryset=Pet.objects.none())  # Filter pets for the logged-in user
+    pet = forms.ModelChoiceField(
+        queryset=Pet.objects.none(), 
+        label="Select Pet", 
+        empty_label="Select your pet"
+    )
     date_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
 
     class Meta:
@@ -50,23 +54,29 @@ class AppointmentForm(forms.ModelForm):
         fields = ['pet', 'date_time', 'notes']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)  # Get user from the view
+        user = kwargs.pop('user', None)  
+        service = kwargs.pop('service', None)  # ✅ Get service from the view
         super().__init__(*args, **kwargs)
-        if user:
-            self.fields['pet'].queryset = Pet.objects.filter(owner=user)  # Filter pets for the current user
+        
+        if user and service:
+            filtered_pets = Pet.objects.filter(owner=user, pet_type=service.pet_type)
+            self.fields['pet'].queryset = filtered_pets  # ✅ Filter pets by pet_type
+            print("Final Pet QuerySet in Form:", self.fields['pet'].queryset)  # Debugging
 
     def clean_date_time(self):
         date_time = self.cleaned_data.get('date_time')
 
-        # Check if the date_time is in the past (Django backend validation)
+        # Check if the date_time is in the past
         if date_time < timezone.now():
             raise ValidationError("You cannot book an appointment in the past!")
 
-        # Additional validation to ensure the time slot is not already taken
+        # Ensure the time slot is not already taken
         if Appointment.objects.filter(date_time=date_time).exists():
             raise ValidationError("This time slot is already booked. Please choose another time.")
 
         return date_time
+
+
 
 class RescheduleAppointmentForm(forms.ModelForm):
     date_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))

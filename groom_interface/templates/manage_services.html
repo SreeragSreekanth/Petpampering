@@ -25,6 +25,14 @@
                             <img src="{% static 'assets/default.webp' %}" class="img-fluid rounded mb-3" alt="placeholder">
                         {% endif %}
 
+                        <p><strong>Pet type:</strong> 
+                            {% if service.pet_type %}
+                                {{ service.pet_type.name }}
+                            {% else %}
+                                Any Pet
+                            {% endif %}
+                        </p>
+
                         <!-- Truncate description to ensure all cards are the same size -->
                         <p class="description"><strong>Description:</strong> {{ service.description|truncatewords:20 }}</p> <!-- Truncates to 20 words -->
                         <p><strong>Price:</strong> ₹{{ service.price }}</p>

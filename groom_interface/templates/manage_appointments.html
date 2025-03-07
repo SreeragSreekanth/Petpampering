@@ -35,6 +35,8 @@
                             <span class="badge bg-warning">Pending</span>
                         {% elif appointment.status == "accepted" %}
                             <span class="badge bg-success">Accepted</span>
+                        {% elif appointment.status == "completed" %}
+                            <span class="badge bg-info">Completed</span>
                         {% else %}
                             <span class="badge bg-danger">Declined</span>
                         {% endif %}
@@ -43,6 +45,8 @@
                         {% if appointment.status == "pending" %}
                             <a href="{% url 'update_appointment' appointment.id 'accepted' %}" class="btn btn-success btn-sm">✅ Accept</a>
                             <a href="{% url 'update_appointment' appointment.id 'declined' %}" class="btn btn-danger btn-sm">❌ Decline</a>
+                        {% elif appointment.status == "accepted" %}
+                            <a href="{% url 'update_appointment' appointment.id 'completed' %}" class="btn btn-primary btn-sm">✔️ Mark as Completed</a>
                         {% else %}
                             <span class="text-muted">No actions available</span>
                         {% endif %}

@@ -2,7 +2,7 @@ from django.db import models
 from userauth.models import User
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from pet_owner.models import Feedback,PetType,PetBreed
+from pet_owner.models import Feedback,PetType,PetBreed,Pet
 
 
 # Create your models here.
@@ -18,10 +18,9 @@ class Service(models.Model):
     availability = models.BooleanField(default=True)
     image = models.ImageField(upload_to='services/', blank=True, null=True)
     pet_type = models.ForeignKey(PetType, on_delete=models.CASCADE, related_name='services')  # Updated
-    breed = models.ForeignKey(PetBreed, on_delete=models.CASCADE, related_name='services', blank=True, null=True)  # Updated    def __str__(self):
 
     def __str__(self):
-        return f"{self.name} - {self.pet_type.name} - {self.breed.name if self.breed else 'Any Breed'} - {self.groomer.username}"
+        return f"{self.name} - {self.pet_type.name} - {self.groomer.username}"
 
 
 class GroomerProfile(models.Model):
@@ -45,11 +44,13 @@ class Appointment(models.Model):
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('declined', 'Declined'),
+        ('completed', 'Completed'),
     ]
     
     groomer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="appointments")
     pet_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner_appointments")
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE,null=True, blank=True)
     date_time = models.DateTimeField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     notes = models.TextField(blank=True, null=True)  # Add this field

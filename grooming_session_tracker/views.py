@@ -47,7 +47,7 @@ def mark_all_as_read(request):
 @role_required(['owner'])
 def pet_owner_expenses(request):
     user = request.user
-    appointments = Appointment.objects.filter(pet_owner=user, status='accepted')
+    appointments = Appointment.objects.filter(pet_owner=user, status='completed')
 
     appointment_details = []
 
@@ -82,7 +82,7 @@ def pet_owner_expenses(request):
 @role_required(['groomer'])
 def groomer_payments(request):
     user = request.user
-    appointments = Appointment.objects.filter(groomer=user, status='accepted').select_related("service")
+    appointments = Appointment.objects.filter(groomer=user, status='completed').select_related("service")
 
     appointment_details = []
     earnings_summary = defaultdict(float)

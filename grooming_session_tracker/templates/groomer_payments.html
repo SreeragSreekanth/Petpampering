@@ -21,6 +21,7 @@
     <!-- Payment Details -->
     <div class="row">
       {% for detail in appointment_details %}
+        {% if detail.appointment.status == 'completed' %}
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card shadow-sm border-0 rounded-4 p-3">
             <div class="card-body">
@@ -46,28 +47,20 @@
               </ul>
 
               {% if detail.invoice.status == 'paid' %}
-                  <a href="{% url 'view_invoice_pdf' detail.invoice.id %}" target="_blank" class="btn btn-primary">View Invoice PDF</a>
-              {% endif %}
-
-              <!-- Generate Invoice PDF Button -->
-              {% if detail.invoice.status == 'paid' %}
+                <a href="{% url 'view_invoice_pdf' detail.invoice.id %}" target="_blank" class="btn btn-primary">View Invoice PDF</a>
                 <a href="{% url 'generate_invoice_pdf' detail.invoice.id %}" class="btn btn-primary btn-sm mt-2">
                   <i class="bi bi-file-earmark-pdf"></i> Generate Invoice
                 </a>
-              {% endif %}
-              
-              <!-- Mark as Paid Button -->
-              {% if detail.invoice.status != 'paid' %}
+              {% else %}
                 <form method="post" action="{% url 'update_payment_status' detail.appointment.id %}" class="mt-3">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-primary btn-sm">Mark as Paid</button>
                 </form>
-              {% else %}
-                <p class="text-success mt-3"><i class="bi bi-check-circle-fill"></i> This invoice is paid.</p>
               {% endif %}
             </div>
           </div>
         </div>
+        {% endif %}
       {% endfor %}
     </div>
   {% else %}
@@ -75,7 +68,8 @@
       You haven't received any payments yet.
     </div>
   {% endif %}
-    <!-- Pagination Controls -->
+
+  <!-- Pagination Controls -->
   <div class="d-flex justify-content-center mt-4">
     <ul class="pagination">
       {% if appointment_details.has_previous %}

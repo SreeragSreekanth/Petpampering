@@ -19,7 +19,7 @@
             <div class="card shadow-lg border-0 rounded-4 h-100">
                 <!-- Service Image -->
                 {% if service.image %}
-                    <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
+                    <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: contain;">
                 {% else %}
                     <img src="{% static 'assets/default.webp' %}" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
                 {% endif %}
@@ -34,7 +34,7 @@
                 <!-- Buttons for View Details and View Groomer Profile -->
                 <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
                     <a href="{% url 'view_service' service.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
-                    <a href="{% url 'groomer_profile' service.groomer.id %}" class="btn btn-outline-secondary btn-sm">View Profile</a>
+                    <a href="{% url 'groomer_profile' service.groomer.id %}" class="btn btn-outline-secondary btn-sm">View {{ service.groomer.username }}</a>
                 </div>
             </div>
         </div>
@@ -50,9 +50,9 @@
             <div class="card shadow-lg border-0 rounded-4 h-100">
                 <!-- Service Image -->
                 {% if service.image %}
-                    <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: cover;">
+                    <img src="{{ service.image.url }}" class="card-img-top rounded-top-4" alt="{{ service.name }}" style="height: 200px; object-fit: contain;">
                 {% else %}
-                    <img src="https://via.placeholder.com/300" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
+                    <img src="{% static 'assets/default.webp' %}" class="card-img-top rounded-top-4" alt="Service Image" style="height: 200px; object-fit: cover;">
                 {% endif %}
 
                 <!-- Service Details -->
@@ -65,7 +65,7 @@
                 <!-- Buttons for View Details and View Groomer Profile -->
                 <div class="card-footer bg-transparent border-0 d-flex justify-content-between">
                     <a href="{% url 'view_service' service.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
-                    <a href="{% url 'groomer_profile' service.groomer.id %}" class="btn btn-outline-secondary btn-sm">View Profile</a>
+                    <a href="{% url 'groomer_profile' service.groomer.id %}" class="btn btn-outline-secondary btn-sm">View {{ service.groomer.username }}</a>
                 </div>
             </div>
         </div>

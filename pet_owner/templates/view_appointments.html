@@ -24,22 +24,26 @@
 
                     <!-- Button group -->
                     <div class="d-flex justify-content-between">
-                        <a href="{% url 'reschedule_appointment' appointment.id %}" class="btn btn-warning btn-sm">Reschedule</a>
-
-                        <form action="{% url 'cancel_appointment' appointment.id %}" method="POST" style="display: inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="confirm_cancel" value="True">
-                            <button 
-                                type="submit" 
-                                class="btn btn-danger btn-sm"
-                                {% if appointment.status == 'accepted' %}
-                                    disabled
-                                {% endif %}
-                            >
-                                Cancel
-                            </button>
-                        </form>
+                        <!-- Reschedule button (Disabled when status is 'completed') -->
+                        <a href="{% url 'reschedule_appointment' appointment.id %}" 
+                           class="btn btn-warning btn-sm 
+                           {% if appointment.status == 'completed' %} disabled {% endif %}">
+                            Reschedule
+                        </a>
+                    
+                        <!-- Cancel button (Hidden when status is 'completed' or 'declined') -->
+                        {% if appointment.status != 'completed' and appointment.status != 'declined' %}
+                            <form action="{% url 'cancel_appointment' appointment.id %}" method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="confirm_cancel" value="True">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Cancel
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
+                    
+
                 </div>
             </div>
         </div>
